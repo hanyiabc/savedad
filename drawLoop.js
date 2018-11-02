@@ -1,3 +1,5 @@
+// name: Guan Congyi, Han Yi
+
 var sketchProc = function (processingInstance) {
     with (processingInstance) {
         size(1280, 720);
@@ -12,7 +14,6 @@ var sketchProc = function (processingInstance) {
         var mouseFlag = 0;
         var otherFlag = 0;
         var initialized = 0;
-
 
         // cos and sin using Polar Coordinates to determine direction of explosions
         // compare with cartesian explosion
