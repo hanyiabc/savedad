@@ -1,0 +1,14 @@
+Type: JRPG
+Main: 
+Main father: 火柴人
+Main pet: Panda
+
+BOSS:
+Monster1: Spider
+Monster2: Corc
+
+复活药：Diamond
+血药：
+
+Instruction: In the Map: UDLR, Shift Accel, E bag, 
+During Battle: 
