@@ -6,6 +6,7 @@ var sketchProc = function (processingInstance) {
         frameRate(60);
         angleMode = "radiant";
         
+
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
@@ -57,7 +58,6 @@ var sketchProc = function (processingInstance) {
             this.step = 0;
             this.currFrame = frameCount;
         }
-        var MyPanda = new PandaObj(300,300);
         PandaObj.prototype.draw = function(){
             
             if(this.step<4){
@@ -71,15 +71,30 @@ var sketchProc = function (processingInstance) {
                 this.step = 0;
             }
         }
-        
-        // TO DO Replace with spider and Main CHar
-        var mainChar = [];
-        mainChar.push(loadImage("assets/main_front.png"));
+        mainChar = [];
         mainChar.push(loadImage("assets/main_back.png"));
+        mainChar.push(loadImage("assets/main_back_f1.png"));
+        mainChar.push(loadImage("assets/main_back_f2.png"));
 
-        var SpiderObj = function(x,y){
+        mainChar.push(loadImage("assets/main_front.png"));
+        mainChar.push(loadImage("assets/main_front_f1.png"));
+        mainChar.push(loadImage("assets/main_front_f2.png"));
+
+        mainChar.push(loadImage("assets/main_left.png"));
+        mainChar.push(loadImage("assets/main_right.png"));
+
+
+        var crocImgs = [];
+        crocImgs.push(loadImage("assets/monster1_f1.png"))
+        crocImgs.push(loadImage("assets/monster1_f2.png"))
+        crocImgs.push(loadImage("assets/monster1_f3.png"))
+        crocImgs.push(loadImage("assets/monster1_f4.png"))
+        crocImgs.push(loadImage("assets/monster1_f5.png"))
+        crocImgs.push(loadImage("assets/monster1_f6.png"))
+
+        var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
-            this.size = 60;
+            this.size = 200;
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
@@ -87,26 +102,25 @@ var sketchProc = function (processingInstance) {
             this.spider.push(loadImage("assets/spider2.png"))
             this.spider.push(loadImage("assets/spider3.png"));
         }
-        var spiders = new SpiderObj(300,300);
-        SpiderObj.prototype.draw = function(){
-            switch(this.state){
+        SpiderObj.prototype.draw = function () {
+            switch (this.state) {
                 case 0:
-                image(this.spider[0], this.position.x, this.position.y, 60, 60);
-                break;
+                    image(this.spider[0], this.position.x, this.position.y, this.size, this.size);
+                    break;
                 case 1:
-                image(this.spider[1], this.position.x, this.position.y, 60, 60);
-                break;
+                    image(this.spider[1], this.position.x, this.position.y, this.size, this.size);
+                    break;
                 case 2:
-                image(this.spider[2], this.position.x, this.position.y, 60, 60);
-                break;
+                    image(this.spider[2], this.position.x, this.position.y, this.size, this.size);
+                    break;
             }
-            this.state++;
-            if (this.state> 2) {
-                this.state = 0;
-            }
-            if (this.currFrame) {
+            if(frameCount - this.currFrame > 60)
+            {
+                this.state = 1;
                 this.currFrame = frameCount;
-                
+            }
+            if (this.state > 2) {
+                this.state = 0;
             }
         }
 
@@ -115,28 +129,110 @@ var sketchProc = function (processingInstance) {
             UP: 1,
             DOWN: 2,
             LEFT: 3,
-            RIGHT: 4
+            RIGHT: 4, 
+            UPW: 5, 
+            DOWNW: 6
         };
+        
         var MainChar = function (x, y) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
-            this.size = 60;
-
+            this.currFrame2 = frameCount;
+            this.step = 0;
+            this.size = 150;
             this.MainStates = MainStates.UP;
         };
+
+        var Croc = function (x, y) {
+            this.position = new PVector(x, y);
+            this.currFrame = frameCount;
+            this.step = 0;
+            this.sizeX = 886/4;
+            this.sizeY = 625/4;
+        };
+
+        Croc.prototype.draw = function () 
+        {
+            if (frameCount - this.currFrame > 5) {
+                this.step++;
+                this.currFrame = frameCount;
+            }
+            if(this.step > 11)
+            {
+                this.step = 0;
+            }
+            if(this.step > 5)
+            {
+                image(crocImgs[11-this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);                
+            }
+            else
+            {
+                image(crocImgs[this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);
+            }
+        }
         MainChar.prototype.draw = function () {
             switch (this.MainStates) {
                 case MainStates.UP:
-                    image(mainChar[1], this.position.x, this.position.y, this.size, this.size);
+                    image(mainChar[0], this.position.x, this.position.y, this.size, this.size);
+                    if(frameCount - this.currFrame > 60)
+                    {
+                        this.MainStates++;
+                        this.currFrame = frameCount;
+                    }
                     break;
                 case MainStates.DOWN:
-                    image(mainChar[1], this.position.x, this.position.y, this.size, this.size);                    
+                    image(mainChar[3], this.position.x, this.position.y, this.size, this.size);
+                    if (frameCount - this.currFrame > 60) {
+                        this.MainStates++;
+                        this.currFrame = frameCount;
+                    }
                     break;
                 case MainStates.LEFT:
-                    image(mainChar[1], this.position.x, this.position.y, this.size, this.size);                    
+                    image(mainChar[6], this.position.x, this.position.y, this.size, this.size);
+                    if (frameCount - this.currFrame > 60) {
+                        this.MainStates++;
+                        this.currFrame = frameCount;
+                    }
                     break;
                 case MainStates.RIGHT:
-                    image(mainChar[1], this.position.x, this.position.y, this.size, this.size);                    
+                    image(mainChar[7], this.position.x, this.position.y, this.size, this.size);
+                    if (frameCount - this.currFrame > 60) {
+                        this.MainStates++;
+                        this.currFrame = frameCount;
+                    }
+                    this.currFrame2 = frameCount;
+                    break;
+                case MainStates.UPW:
+                    if (frameCount - this.currFrame === 15) {
+                        this.step = 0;
+                        //this.currFrame = frameCount;
+                    }
+                    else if(frameCount - this.currFrame === 30)
+                    {
+                        this.step=1;
+                        this.currFrame = frameCount;
+                    }
+                    if(frameCount - this.currFrame2 > 120)
+                    {
+                        this.currFrame2 = frameCount;
+                        this.MainStates++;
+                    }
+                    image(mainChar[this.step + 1], this.position.x, this.position.y, this.size, this.size);
+                    break;
+                case MainStates.DOWNW:
+                    if (frameCount - this.currFrame === 15) {
+                        this.step = 0;
+                        //this.currFrame = frameCount;
+                    }
+                    else if (frameCount - this.currFrame === 30) {
+                        this.step = 1;
+                        this.currFrame = frameCount;
+                    }
+                    if (frameCount - this.currFrame2 > 120) {
+                        this.currFrame2 = frameCount;
+                        this.MainStates = 1;
+                    }
+                    image(mainChar[this.step + 4], this.position.x, this.position.y, this.size, this.size);
                     break;
                 default:
                     break;
@@ -144,9 +240,11 @@ var sketchProc = function (processingInstance) {
 
         };
 
-        var mainChara = new MainChar(500, 500);
-        // END TO DO
 
+        var MyPanda = new PandaObj(200, 300);
+        var mainChara = new MainChar(400,400);
+        var croc = new Croc(600,400);
+        var spider = new SpiderObj(800, 400);
         var draw = function () {
             if(state === 0){
                 var f = createFont("monospace");
@@ -170,8 +268,8 @@ var sketchProc = function (processingInstance) {
                 text(" Start Advanture ", 500, 350);
 
                 // Author
-                textSize(15);
-                text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve. R and circle ", 700, 700);
+                textSize(20);
+                text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 500, 650);
 
             }
             else if(state === 1){ // Instruction Page
@@ -193,11 +291,23 @@ var sketchProc = function (processingInstance) {
                     println(2);
                     state = 0;
                     keyArray[ENTER] = 0;
+
                 }
             }
             else if(state === 2){// Start Game
+                background(51, 33, 51);
+                fill(51, 33, 51);
+                rect(0, 0, 1280, 720);
                 MyPanda.draw();
+                mainChara.draw();
+                croc.draw();
+                spider.draw();
+                if (keyArray[ENTER] === 1) {
+                    println(2);
+                    state = 0;
+                    keyArray[ENTER] = 0;
 
+                }
             }
             
             
