@@ -1,4 +1,4 @@
-// name: Guan Congyi, Han Yi
+// name: Guan Congyi, Han Yi, Pan Jiacong
 
 var sketchProc = function (processingInstance) {
     with (processingInstance) {
@@ -44,8 +44,35 @@ var sketchProc = function (processingInstance) {
                  
             }
         };
+        // Panda 
+        var pandas = [];
+        pandas.push(loadImage("assets/panda.png"));
+        pandas.push(loadImage("assets/panda_shy.png"));
+        pandas.push(loadImage("assets/panda_dead.png"));
+        pandas.push(loadImage("assets/panda_angry1.png"));
+
+        var PandaObj = function(x,y){
+            this.x = x;
+            this.y = y;
+            this.step = 0;
+            this.currFrame = frameCount;
+        }
+        var MyPanda = new PandaObj(300,300);
+        PandaObj.prototype.draw = function(){
+            
+            if(this.step<4){
+                image(pandas[this.step], this.x, this.y, 160, 160);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.step++;
+                }
+            }
+            else{
+                this.step = 0;
+            }
+        }
         
-        
+        // TO DO Replace with spider and Main CHar
         var mainChar = [];
         mainChar.push(loadImage("assets/main_front.png"));
         mainChar.push(loadImage("assets/main_back.png"));
@@ -118,6 +145,8 @@ var sketchProc = function (processingInstance) {
         };
 
         var mainChara = new MainChar(500, 500);
+        // END TO DO
+
         var draw = function () {
             if(state === 0){
                 var f = createFont("monospace");
@@ -167,7 +196,7 @@ var sketchProc = function (processingInstance) {
                 }
             }
             else if(state === 2){// Start Game
-                
+                MyPanda.draw();
 
             }
             
