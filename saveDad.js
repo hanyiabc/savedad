@@ -1,4 +1,4 @@
-// name: Guan Congyi, Han Yi, Pan Jiacong
+// Name: Guan Congyi, Han Yi, Pan Jiacong
 
 var sketchProc = function (processingInstance) {
     with (processingInstance) {
@@ -6,7 +6,6 @@ var sketchProc = function (processingInstance) {
         frameRate(60);
         angleMode = "radiant";
         
-
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
@@ -14,19 +13,48 @@ var sketchProc = function (processingInstance) {
         var state = 0;
         var keyArray = [];
         var keyReleased = function() {keyArray[keyCode] = 1;};
+        
+        // Panda 
+        var pandas = [];
+        pandas.push(loadImage("assets/panda.png"));
+        pandas.push(loadImage("assets/panda_shy.png"));
+        pandas.push(loadImage("assets/panda_dead.png"));
+        //pandas.push(loadImage("assets/panda_angry1.png"));
+
+        var PandaObj = function(x,y){
+            this.x = x;
+            this.y = y;
+            this.step = 0;
+            this.currFrame = frameCount;
+        }
+        PandaObj.prototype.draw = function(){
+            if(this.step<3){
+                image(pandas[this.step], this.x, this.y, 240, 160);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.step++;
+                }
+            }
+            else{
+                this.step = 0;
+            }
+        }
         //Create Bullet
         var BulletObj = function(x,y){
             this.x = x;
             this.y = y;
             this.pos = 1;
+            this.avatar = pandas;
         };
-        var bullet = new BulletObj(75,150);
+        
+        var MyPandaBullet = new PandaObj(1,1);
         BulletObj.prototype.draw = function() {
             bullet.select();
-            if (this.pos === 1){this.x = 480;this.y = 240;}
-            if (this.pos === 2){this.x = 480;this.y = 340;}
-            return [this.x, this.y];
-            
+            // set bullet position
+            if (this.pos === 1){this.x = 350;this.y = 170;}
+            if (this.pos === 2){this.x = 350;this.y = 270;}
+            MyPandaBullet.draw();
+            MyPandaBullet.x = this.x; MyPandaBullet.y =  this.y;
         };
         BulletObj.prototype.select = function(){
             if(keyArray[UP]===1){
@@ -40,37 +68,10 @@ var sketchProc = function (processingInstance) {
             if(keyArray[ENTER]===1){
                 if(this.pos === 1){state = 1;}
                 if(this.pos === 2){state = 2;}
-                keyArray[ENTER]=0;
-                //this.pos = 1;
-                 
+                keyArray[ENTER]=0;  
             }
         };
-        // Panda 
-        var pandas = [];
-        pandas.push(loadImage("assets/panda.png"));
-        pandas.push(loadImage("assets/panda_shy.png"));
-        pandas.push(loadImage("assets/panda_dead.png"));
-        pandas.push(loadImage("assets/panda_angry1.png"));
 
-        var PandaObj = function(x,y){
-            this.x = x;
-            this.y = y;
-            this.step = 0;
-            this.currFrame = frameCount;
-        }
-        PandaObj.prototype.draw = function(){
-            
-            if(this.step<4){
-                image(pandas[this.step], this.x, this.y, 160, 160);
-                if(frameCount-this.currFrame>30){
-                    this.currFrame = frameCount;
-                    this.step++;
-                }
-            }
-            else{
-                this.step = 0;
-            }
-        }
         mainChar = [];
         mainChar.push(loadImage("assets/main_back.png"));
         mainChar.push(loadImage("assets/main_back_f1.png"));
@@ -85,12 +86,19 @@ var sketchProc = function (processingInstance) {
 
 
         var crocImgs = [];
-        crocImgs.push(loadImage("assets/monster1_f1.png"))
-        crocImgs.push(loadImage("assets/monster1_f2.png"))
-        crocImgs.push(loadImage("assets/monster1_f3.png"))
-        crocImgs.push(loadImage("assets/monster1_f4.png"))
-        crocImgs.push(loadImage("assets/monster1_f5.png"))
-        crocImgs.push(loadImage("assets/monster1_f6.png"))
+        crocImgs.push(loadImage("assets/monster1_f1.png"));
+        crocImgs.push(loadImage("assets/monster1_f2.png"));
+        crocImgs.push(loadImage("assets/monster1_f3.png"));
+        crocImgs.push(loadImage("assets/monster1_f4.png"));
+        crocImgs.push(loadImage("assets/monster1_f5.png"));
+        crocImgs.push(loadImage("assets/monster1_f6.png"));
+
+        var textImgs = [];
+        textImgs.push(loadImage("assets/save_dad.png"));
+        textImgs.push(loadImage("assets/Instruction.png"));
+        textImgs.push(loadImage("assets/Start_Adv.png"));
+
+
 
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
@@ -98,9 +106,10 @@ var sketchProc = function (processingInstance) {
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
-            this.spider.push(loadImage("assets/spider1.png"))
+            //this.spider.push(loadImage("assets/spider1.png"))
             this.spider.push(loadImage("assets/spider2.png"))
             this.spider.push(loadImage("assets/spider3.png"));
+            this.spider.push(loadImage("assets/spider2.png"))
         }
         SpiderObj.prototype.draw = function () {
             switch (this.state) {
@@ -114,12 +123,14 @@ var sketchProc = function (processingInstance) {
                     image(this.spider[2], this.position.x, this.position.y, this.size, this.size);
                     break;
             }
-            if(frameCount - this.currFrame > 60)
-            {
-                this.state = 1;
-                this.currFrame = frameCount;
+            if(this.state<3){
+                //image(this.spider[this.state], this.x, this.y, 240, 160);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.state++;
+                }
             }
-            if (this.state > 2) {
+            else{
                 this.state = 0;
             }
         }
@@ -245,73 +256,76 @@ var sketchProc = function (processingInstance) {
         var mainChara = new MainChar(400,400);
         var croc = new Croc(600,400);
         var spider = new SpiderObj(800, 400);
+        var bullet = new BulletObj(75,150);
         var draw = function () {
-            if(state === 0){
-                var f = createFont("monospace");
-                // Title
-                textFont(f);
-                background(166, 103, 166);
-                textSize(42);
-                fill(232, 211, 23);
-                text("  _Save Dad_", 440, 70);
-                
-                //bullet point
-                stroke(228, 237, 59);
-                strokeWeight(10);
-                var pos = bullet.draw();
-                point(pos[0],pos[1]);
-                
-                // Options
-                textSize(30);
-                fill(40, 48, 44);
-                text(" Instruction ", 500, 250);
-                text(" Start Advanture ", 500, 350);
+            switch (state)
+            {
+                case 0: // main screen
+                    var f = createFont("monospace");
+                    // Title
+                    textFont(f);
+                    background(166, 103, 166);
+                    textSize(42);
+                    fill(232, 211, 23);
+                    image(textImgs[0],380, -180, 500, 500);
+                    
+                    //bullet point
+                    stroke(228, 237, 59);
+                    strokeWeight(10);
+                    var pos = bullet.draw();
+                    
+                    // Options
+                    textSize(30);
+                    fill(40, 48, 44);
+                    image(textImgs[1], 340, -60, 600, 600);
+                    image(textImgs[2], 385, 40, 600, 600);    
 
-                // Author
-                textSize(20);
-                text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 500, 650);
+                    // Author
+                    textSize(20);
+                    text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 500, 650);
+                    break;
+                case 1:  // instruction
+                    var f = createFont("monospace");
+                    textFont(f);
+                    background(51, 33, 51);
+                    textSize(42);
+                    fill(232, 211, 23);
+                    text("  _Instruction_ \n", 440, 70);
+                    textSize(25);
+                    text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
+                    text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n" , 300, 240);
+                    text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
+                    text("\n             Iris starts the journey with pet Panda.               ",300, 360);
+                    text("             They defeat monsters around the kingdom.              ", 300,420);
+                    text("             With the great courage and wisdom.               ",300, 450);
+                    text("             the Boss was slayed and Dad was saved.", 300, 480);
+                    if(keyArray[ENTER]===1){
+                        //println(2);
+                        state = 0;
+                        keyArray[ENTER] = 0;
+
+                    }
+                    break;
+                case 2:  // start game
+                    background(51, 33, 51);
+                    fill(51, 33, 51);
+                    rect(0, 0, 1280, 720);
+                    MyPanda.draw();
+                    mainChara.draw();
+                    croc.draw();
+                    spider.draw();
+                    if (keyArray[ENTER] === 1) {
+                        //println(2);
+                        state = 0;
+                        keyArray[ENTER] = 0;
+                    }
+                    break;
+
+                case 3: // 
+                    break;
 
             }
-            else if(state === 1){ // Instruction Page
-                var f = createFont("monospace");
-                textFont(f);
-                background(51, 33, 51);
-                textSize(42);
-                fill(232, 211, 23);
-                text("  _Instruction_ \n", 440, 70);
-                textSize(25);
-                text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
-                text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n" , 300, 240);
-                text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
-                text("\n             Iris starts the journey with pet Panda.               ",300, 360);
-                text("             They defeat monsters around the kingdom.              ", 300,420);
-                text("             With the great courage and wisdom.               ",300, 450);
-                text("             the Boss was slayed and Dad was saved.", 300, 480);
-                if(keyArray[ENTER]===1){
-                    println(2);
-                    state = 0;
-                    keyArray[ENTER] = 0;
 
-                }
-            }
-            else if(state === 2){// Start Game
-                background(51, 33, 51);
-                fill(51, 33, 51);
-                rect(0, 0, 1280, 720);
-                MyPanda.draw();
-                mainChara.draw();
-                croc.draw();
-                spider.draw();
-                if (keyArray[ENTER] === 1) {
-                    println(2);
-                    state = 0;
-                    keyArray[ENTER] = 0;
-
-                }
-            }
-            
-            
-            //mainChara.draw();
 
         };
 
