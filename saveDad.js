@@ -99,9 +99,10 @@ var sketchProc = function (processingInstance) {
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
-            this.spider.push(loadImage("assets/spider1.png"))
+            //this.spider.push(loadImage("assets/spider1.png"))
             this.spider.push(loadImage("assets/spider2.png"))
             this.spider.push(loadImage("assets/spider3.png"));
+            this.spider.push(loadImage("assets/spider2.png"))
         }
         SpiderObj.prototype.draw = function () {
             switch (this.state) {
@@ -115,12 +116,14 @@ var sketchProc = function (processingInstance) {
                     image(this.spider[2], this.position.x, this.position.y, this.size, this.size);
                     break;
             }
-            if(frameCount - this.currFrame > 60)
-            {
-                this.state = 1;
-                this.currFrame = frameCount;
+            if(this.state<3){
+                //image(this.spider[this.state], this.x, this.y, 240, 160);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.state++;
+                }
             }
-            if (this.state > 2) {
+            else{
                 this.state = 0;
             }
         }
@@ -243,7 +246,6 @@ var sketchProc = function (processingInstance) {
 
 
         var MyPanda = new PandaObj(200, 300);
-        
         var mainChara = new MainChar(400,400);
         var croc = new Croc(600,400);
         var spider = new SpiderObj(800, 400);
@@ -264,9 +266,6 @@ var sketchProc = function (processingInstance) {
                     stroke(228, 237, 59);
                     strokeWeight(10);
                     var pos = bullet.draw();
-                    
-                    //image(pandas[random(1,2)], pos[0],pos[1], 240, 160);
-                    //point(pos[0],pos[1]);
                     
                     // Options
                     textSize(30);
@@ -313,6 +312,9 @@ var sketchProc = function (processingInstance) {
                         state = 0;
                         keyArray[ENTER] = 0;
                     }
+                    break;
+
+                case 3: // 
                     break;
 
             }
