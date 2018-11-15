@@ -1,4 +1,4 @@
-// name: Guan Congyi, Han Yi, Pan Jiacong
+// Name: Guan Congyi, Han Yi, Pan Jiacong
 
 var sketchProc = function (processingInstance) {
     with (processingInstance) {
