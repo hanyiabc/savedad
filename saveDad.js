@@ -249,73 +249,74 @@ var sketchProc = function (processingInstance) {
         var spider = new SpiderObj(800, 400);
         var bullet = new BulletObj(75,150);
         var draw = function () {
-            if(state === 0){
-                var f = createFont("monospace");
-                // Title
-                textFont(f);
-                background(166, 103, 166);
-                textSize(42);
-                fill(232, 211, 23);
-                text("  _Save Dad_", 440, 70);
-                
-                //bullet point
-                stroke(228, 237, 59);
-                strokeWeight(10);
-                var pos = bullet.draw();
-                
-                //image(pandas[random(1,2)], pos[0],pos[1], 240, 160);
-                //point(pos[0],pos[1]);
-                
-                // Options
-                textSize(30);
-                fill(40, 48, 44);
-                text(" Instruction ", 500, 250);
-                text(" Start Advanture ", 500, 350);
+            switch (state)
+            {
+                case 0: // main screen
+                    var f = createFont("monospace");
+                    // Title
+                    textFont(f);
+                    background(166, 103, 166);
+                    textSize(42);
+                    fill(232, 211, 23);
+                    text("  _Save Dad_", 440, 70);
+                    
+                    //bullet point
+                    stroke(228, 237, 59);
+                    strokeWeight(10);
+                    var pos = bullet.draw();
+                    
+                    //image(pandas[random(1,2)], pos[0],pos[1], 240, 160);
+                    //point(pos[0],pos[1]);
+                    
+                    // Options
+                    textSize(30);
+                    fill(40, 48, 44);
+                    text(" Instruction ", 500, 250);
+                    text(" Start Advanture ", 500, 350);
 
-                // Author
-                textSize(20);
-                text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 500, 650);
+                    // Author
+                    textSize(20);
+                    text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 500, 650);
+                    break;
+                case 1:  // instruction
+                    var f = createFont("monospace");
+                    textFont(f);
+                    background(51, 33, 51);
+                    textSize(42);
+                    fill(232, 211, 23);
+                    text("  _Instruction_ \n", 440, 70);
+                    textSize(25);
+                    text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
+                    text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n" , 300, 240);
+                    text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
+                    text("\n             Iris starts the journey with pet Panda.               ",300, 360);
+                    text("             They defeat monsters around the kingdom.              ", 300,420);
+                    text("             With the great courage and wisdom.               ",300, 450);
+                    text("             the Boss was slayed and Dad was saved.", 300, 480);
+                    if(keyArray[ENTER]===1){
+                        //println(2);
+                        state = 0;
+                        keyArray[ENTER] = 0;
+
+                    }
+                    break;
+                case 2:  // start game
+                    background(51, 33, 51);
+                    fill(51, 33, 51);
+                    rect(0, 0, 1280, 720);
+                    MyPanda.draw();
+                    mainChara.draw();
+                    croc.draw();
+                    spider.draw();
+                    if (keyArray[ENTER] === 1) {
+                        //println(2);
+                        state = 0;
+                        keyArray[ENTER] = 0;
+                    }
+                    break;
 
             }
-            else if(state === 1){ // Instruction Page
-                var f = createFont("monospace");
-                textFont(f);
-                background(51, 33, 51);
-                textSize(42);
-                fill(232, 211, 23);
-                text("  _Instruction_ \n", 440, 70);
-                textSize(25);
-                text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
-                text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n" , 300, 240);
-                text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
-                text("\n             Iris starts the journey with pet Panda.               ",300, 360);
-                text("             They defeat monsters around the kingdom.              ", 300,420);
-                text("             With the great courage and wisdom.               ",300, 450);
-                text("             the Boss was slayed and Dad was saved.", 300, 480);
-                if(keyArray[ENTER]===1){
-                    //println(2);
-                    state = 0;
-                    keyArray[ENTER] = 0;
 
-                }
-            }
-            else if(state === 2){// Start Game
-                background(51, 33, 51);
-                fill(51, 33, 51);
-                rect(0, 0, 1280, 720);
-                MyPanda.draw();
-                mainChara.draw();
-                croc.draw();
-                spider.draw();
-                if (keyArray[ENTER] === 1) {
-                    //println(2);
-                    state = 0;
-                    keyArray[ENTER] = 0;
-                }
-            }
-            
-            
-            //mainChara.draw();
 
         };
 
