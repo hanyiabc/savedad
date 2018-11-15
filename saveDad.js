@@ -85,12 +85,19 @@ var sketchProc = function (processingInstance) {
 
 
         var crocImgs = [];
-        crocImgs.push(loadImage("assets/monster1_f1.png"))
-        crocImgs.push(loadImage("assets/monster1_f2.png"))
-        crocImgs.push(loadImage("assets/monster1_f3.png"))
-        crocImgs.push(loadImage("assets/monster1_f4.png"))
-        crocImgs.push(loadImage("assets/monster1_f5.png"))
-        crocImgs.push(loadImage("assets/monster1_f6.png"))
+        crocImgs.push(loadImage("assets/monster1_f1.png"));
+        crocImgs.push(loadImage("assets/monster1_f2.png"));
+        crocImgs.push(loadImage("assets/monster1_f3.png"));
+        crocImgs.push(loadImage("assets/monster1_f4.png"));
+        crocImgs.push(loadImage("assets/monster1_f5.png"));
+        crocImgs.push(loadImage("assets/monster1_f6.png"));
+
+        var textImgs = [];
+        textImgs.push(loadImage("assets/save_dad.png"));
+        textImgs.push(loadImage("assets/Instruction.png"));
+        textImgs.push(loadImage("assets/Start_Adv.png"));
+
+
 
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
@@ -98,8 +105,8 @@ var sketchProc = function (processingInstance) {
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
-            this.spider.push(loadImage("assets/spider1.png"))
-            this.spider.push(loadImage("assets/spider2.png"))
+            this.spider.push(loadImage("assets/spider1.png"));
+            this.spider.push(loadImage("assets/spider2.png"));
             this.spider.push(loadImage("assets/spider3.png"));
         }
         SpiderObj.prototype.draw = function () {
@@ -253,7 +260,8 @@ var sketchProc = function (processingInstance) {
                 background(166, 103, 166);
                 textSize(42);
                 fill(232, 211, 23);
-                text("  _Save Dad_", 440, 70);
+                //text("  _Save Dad_", 440, 70);
+                image(textImgs[0],380, -180, 500, 500);
                 
                 //bullet point
                 stroke(228, 237, 59);
@@ -262,10 +270,14 @@ var sketchProc = function (processingInstance) {
                 point(pos[0],pos[1]);
                 
                 // Options
-                textSize(30);
-                fill(40, 48, 44);
-                text(" Instruction ", 500, 250);
-                text(" Start Advanture ", 500, 350);
+                //textSize(30);
+                //fill(40, 48, 44);
+                
+                //text(" Instruction ", 500, 250);
+                //text(" Start Advanture ", 500, 350);
+
+                image(textImgs[1], 340, -60, 600, 600);
+                image(textImgs[2], 385, 40, 600, 600);
 
                 // Author
                 textSize(20);
