@@ -6,7 +6,6 @@ var sketchProc = function (processingInstance) {
         frameRate(60);
         angleMode = "radiant";
         
-
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
@@ -14,19 +13,48 @@ var sketchProc = function (processingInstance) {
         var state = 0;
         var keyArray = [];
         var keyReleased = function() {keyArray[keyCode] = 1;};
+        
+        // Panda 
+        var pandas = [];
+        pandas.push(loadImage("assets/panda.png"));
+        pandas.push(loadImage("assets/panda_shy.png"));
+        pandas.push(loadImage("assets/panda_dead.png"));
+        //pandas.push(loadImage("assets/panda_angry1.png"));
+
+        var PandaObj = function(x,y){
+            this.x = x;
+            this.y = y;
+            this.step = 0;
+            this.currFrame = frameCount;
+        }
+        PandaObj.prototype.draw = function(){
+            if(this.step<3){
+                image(pandas[this.step], this.x, this.y, 240, 160);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.step++;
+                }
+            }
+            else{
+                this.step = 0;
+            }
+        }
         //Create Bullet
         var BulletObj = function(x,y){
             this.x = x;
             this.y = y;
             this.pos = 1;
+            this.avatar = pandas;
         };
-        var bullet = new BulletObj(75,150);
+        
+        var MyPandaBullet = new PandaObj(1,1);
         BulletObj.prototype.draw = function() {
             bullet.select();
-            if (this.pos === 1){this.x = 480;this.y = 240;}
-            if (this.pos === 2){this.x = 480;this.y = 340;}
-            return [this.x, this.y];
-            
+            // set bullet position
+            if (this.pos === 1){this.x = 350;this.y = 170;}
+            if (this.pos === 2){this.x = 350;this.y = 270;}
+            MyPandaBullet.draw();
+            MyPandaBullet.x = this.x; MyPandaBullet.y =  this.y;
         };
         BulletObj.prototype.select = function(){
             if(keyArray[UP]===1){
@@ -40,37 +68,10 @@ var sketchProc = function (processingInstance) {
             if(keyArray[ENTER]===1){
                 if(this.pos === 1){state = 1;}
                 if(this.pos === 2){state = 2;}
-                keyArray[ENTER]=0;
-                //this.pos = 1;
-                 
+                keyArray[ENTER]=0;  
             }
         };
-        // Panda 
-        var pandas = [];
-        pandas.push(loadImage("assets/panda.png"));
-        pandas.push(loadImage("assets/panda_shy.png"));
-        pandas.push(loadImage("assets/panda_dead.png"));
-        pandas.push(loadImage("assets/panda_angry1.png"));
 
-        var PandaObj = function(x,y){
-            this.x = x;
-            this.y = y;
-            this.step = 0;
-            this.currFrame = frameCount;
-        }
-        PandaObj.prototype.draw = function(){
-            
-            if(this.step<4){
-                image(pandas[this.step], this.x, this.y, 160, 160);
-                if(frameCount-this.currFrame>30){
-                    this.currFrame = frameCount;
-                    this.step++;
-                }
-            }
-            else{
-                this.step = 0;
-            }
-        }
         mainChar = [];
         mainChar.push(loadImage("assets/main_back.png"));
         mainChar.push(loadImage("assets/main_back_f1.png"));
@@ -242,9 +243,11 @@ var sketchProc = function (processingInstance) {
 
 
         var MyPanda = new PandaObj(200, 300);
+        
         var mainChara = new MainChar(400,400);
         var croc = new Croc(600,400);
         var spider = new SpiderObj(800, 400);
+        var bullet = new BulletObj(75,150);
         var draw = function () {
             if(state === 0){
                 var f = createFont("monospace");
@@ -259,7 +262,9 @@ var sketchProc = function (processingInstance) {
                 stroke(228, 237, 59);
                 strokeWeight(10);
                 var pos = bullet.draw();
-                point(pos[0],pos[1]);
+                
+                //image(pandas[random(1,2)], pos[0],pos[1], 240, 160);
+                //point(pos[0],pos[1]);
                 
                 // Options
                 textSize(30);
@@ -288,7 +293,7 @@ var sketchProc = function (processingInstance) {
                 text("             With the great courage and wisdom.               ",300, 450);
                 text("             the Boss was slayed and Dad was saved.", 300, 480);
                 if(keyArray[ENTER]===1){
-                    println(2);
+                    //println(2);
                     state = 0;
                     keyArray[ENTER] = 0;
 
@@ -303,10 +308,9 @@ var sketchProc = function (processingInstance) {
                 croc.draw();
                 spider.draw();
                 if (keyArray[ENTER] === 1) {
-                    println(2);
+                    //println(2);
                     state = 0;
                     keyArray[ENTER] = 0;
-
                 }
             }
             
