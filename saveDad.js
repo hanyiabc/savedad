@@ -251,7 +251,6 @@ var sketchProc = function (processingInstance) {
 
         };
 
-
         var MyPanda = new PandaObj(200, 300);
         var mainChara = new MainChar(400,400);
         var croc = new Croc(600,400);
@@ -310,10 +309,10 @@ var sketchProc = function (processingInstance) {
                     background(51, 33, 51);
                     fill(51, 33, 51);
                     rect(0, 0, 1280, 720);
-                    MyPanda.draw();
-                    mainChara.draw();
-                    croc.draw();
-                    spider.draw();
+                    //MyPanda.draw();
+                    //mainChara.draw();
+                    //croc.draw();
+                    //spider.draw();
                     if (keyArray[ENTER] === 1) {
                         //println(2);
                         state = 0;
@@ -321,8 +320,10 @@ var sketchProc = function (processingInstance) {
                     }
                     break;
 
-                case 3: // 
+                case 3: // Game main screen
+                    
                     break;
+                
 
             }
 
