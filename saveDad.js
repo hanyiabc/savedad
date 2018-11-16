@@ -9,11 +9,12 @@ var sketchProc = function (processingInstance) {
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
-                    3 - 
         */
+
         var state = 0;
         var keyArray = [];
-        var keyReleased = function() {keyArray[keyCode] = 1;};
+        var keyPressed = function() {keyArray[keyCode] = 1;};
+        var keyReleased = function() {keyArray[keyCode] = 0;};
         
         // Panda 
         var pandas = [];
@@ -74,63 +75,48 @@ var sketchProc = function (processingInstance) {
         // game class for initializing wall block grass block and tilemap
         var wall = loadImage("assets/block_brown_main.png");
         var grass = loadImage("assets/grassblock1.png");
-        var wallObj = function(x,y){this.x = x;this.y = y;}
-        wallObj.prototype.draw = function(){image(wall, this.x, this.y, 40, 40);}
-        var grassObj = function(x,y){this.x = x;this.y = y;}
-        grassObj.prototype.draw = function(){image(grass, this.x, this.y, 40, 40);}
+        var wallObj = function(x,y){this.x = x;this.y = y;this.size = 40}
+        wallObj.prototype.draw = function(){image(wall, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
+        var grassObj = function(x,y){this.x = x;this.y = y;this.size = 40}
+        grassObj.prototype.draw = function(){image(grass, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
         var gameObj = function(){
-            this.tilemap = [ "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", //80
-            "w                  ggggggggggg                      							w",
-            "w                                    w     w                     				w",
-            "w                                    w     w                      				w",
-            "w                                                      w     w                 w",
-            "wwwwwww                      wwwwwwwww     w                   			    w",
-            "wwww              											                    w",
-            "w                 											        wwwwwww     w",
-            "w         wwwwwwww											   gg               w",
-            "w s               											                    w",
-            "w           gg     											            ggggw",
-            "w      gg          											    gg          w",
-            "w             gg   											                w",
-            "w         gg       											              ggw",
-            "w           gg     											        gg      w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w               ww											    w         w     w",
-            "w   w         wwww											   w w       w w    w",
-            "w     w         ww											  w w w     w w w   w",
-            "w																				w",
-            "w       w         											    w         w     w",
-            "wwwwwwwwwww       											    w         w     w",
-            "w       w         											    w         w     w",
-            "w     w           											                    w",
-            "w    w            											                    w",
-            "w       w         											                    w",
-            "wwwwwwwwww        											                    w",
-            "w       w         											                    w",
-            "w     w           											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w    w            											                    w",
-            "w       w         											                    w",
-            "wwwwwwwwww        											                    w",
-            "w       w         											                    w",
-            "w     w           											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "w                 											                    w",
-            "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
+            this.tilemap = [ 
+            "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", //64
+            "w                  ggggggggggg                      			w",
+            "w                                                              w",
+            "w                                                              w",
+            "wwwwwww                                                w     w w",
+            "wwwwwww                      wwwwwwwww     w                   w",
+            "wwwwwww          											    w",
+            "w                 											    w",
+            "w         wwwwwwww											   gw",
+            "w         wwwwwwww											    w",
+            "w         wwwwwwww											    w",
+            "w      gg          											w",
+            "w             gg   											w",
+            "w         gg       											w",
+            "w           gg     											w",
+            "w                 											    w",
+            "w                 											    w",
+            "w               ww											    w",
+            "w   w         wwww											   ww",
+            "w     w         ww											  www",
+            "w																w",
+            "w       w         											    w",
+            "wwwwwwwwwww       											    w",
+            "w       w         											    w",
+            "w     w           											    w",
+            "w    w            											    w",
+            "w       w         											    w",
+            "wwwwwwwwww        											    w",
+            "w       w         											    w",
+            "w     w           											    w",
+            "w                 											    w",
+            "w                 											    w",
+            "w                 											    w",
+            "w    w            											    w",
+            "w    w            											    w",
+            "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
             this.xCor = 0;
             this.yCor = 0;
             this.initMap = 0;
@@ -200,24 +186,6 @@ var sketchProc = function (processingInstance) {
             }
         }
 
-        var MainStates = {
-            UP: 1,
-            DOWN: 2,
-            LEFT: 3,
-            RIGHT: 4, 
-            UPW: 5, 
-            DOWNW: 6
-        };
-        
-        var MainChar = function (x, y,size) {
-            this.position = new PVector(x, y);
-            this.currFrame = frameCount;
-            this.currFrame2 = frameCount;
-            this.step = 0;
-            this.size = size;
-            this.MainStates = MainStates.UP;
-        };
-
         var Croc = function (x, y) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
@@ -245,7 +213,122 @@ var sketchProc = function (processingInstance) {
                 image(crocImgs[this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);
             }
         }
-        MainChar.prototype.draw = function () {
+
+        // Maincharacter
+        var mainChara;
+        var MainStates = {
+            UP: 1,
+            DOWN: 2,
+            LEFT: 3,
+            RIGHT: 4, 
+            UPW: 5, 
+            DOWNW: 6
+        };
+
+        var MainChar = function (x, y,size) {
+            this.position = new PVector(x, y);
+            this.currFrame = frameCount;
+            this.currFrame2 = frameCount;
+            this.step = 0;
+            this.size = size;
+            this.MainStates = MainStates.UPW;
+        };
+
+        //functions for checking wall
+        var checkWallUp = function () {
+            for (var i = 0; i < game.walls.length; i++) {
+                if (
+                    (
+                        (
+                            (mainChara.position.x - mainChara.size  / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
+                            (mainChara.position.x - mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
+                        )||
+                        (
+                            (mainChara.position.x + mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
+                            (mainChara.position.x + mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
+                        )
+                    ) && 
+                    (mainChara.position.y - 2 - mainChara.size / 2) >= (game.walls[i].y + game.walls[i].size / 2 - 3) &&
+                    (mainChara.position.y - 2 - mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
+                    )
+                {
+                    return  true;
+                }
+
+            }
+        };
+        var checkWallRight = function () {
+            for (var i = 0; i < game.walls.length; i++) {
+                if
+                (
+                    (
+                        (
+                            (mainChara.position.y - mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
+                            (mainChara.position.y - mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
+                        )||
+                        (
+                            (mainChara.position.y + mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
+                            (mainChara.position.y + mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
+                        )
+                    )&&
+                    (mainChara.position.x + 2 + mainChara.size / 2) <= (game.walls[i].x - game.walls[i].size / 2 + 3) &&
+                    (mainChara.position.x + 2 + mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2)
+                )
+                {
+                    return true;
+                }
+
+            }
+        };
+        var checkWallLeft = function () {
+            for (var i = 0; i < game.walls.length; i++) {
+                if
+                (
+                    (
+                        (
+                            (mainChara.position.y - mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
+                            (mainChara.position.y - mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
+                        ) ||
+                        (
+                            (mainChara.position.y + mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
+                            (mainChara.position.y + mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
+                        )
+                    ) &&
+                    (mainChara.position.x - 2 - mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2) &&
+                    (mainChara.position.x - 2 - mainChara.size / 2) >= (game.walls[i].x + game.walls[i].size / 2 - 3)
+                )
+                {
+                    return true;
+                }
+
+            }
+        };
+        var checkWallDown = function ()
+        {
+            for (var i = 0; i < game.walls.length; i++) {
+                if (
+                    (
+                        (
+                            (mainChara.position.x - mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
+                            (mainChara.position.x - mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
+                        ) ||
+                        (
+                            (mainChara.position.x + mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
+                            (mainChara.position.x + mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
+                        )
+                    ) &&
+                    (mainChara.position.y + 2 + mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
+                    (mainChara.position.y + 2 + mainChara.size / 2) <= (game.walls[i].y - game.walls[i].size / 2 + 3)
+                )
+                {
+                    return true;
+                }
+
+            }
+        };
+
+        // for starting screen
+        MainChar.prototype.disp = function () {
             switch (this.MainStates) {
                 case MainStates.UP:
                     image(mainChar[0], this.position.x, this.position.y, this.size, this.size);
@@ -314,6 +397,115 @@ var sketchProc = function (processingInstance) {
             }
 
         };
+        MainChar.prototype.draw = function () {
+            switch (this.MainStates) {
+                case MainStates.LEFT:
+                    image(mainChar[6], this.position.x - this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    break;
+                case MainStates.RIGHT:
+                    image(mainChar[7], this.position.x- this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    break;
+                case MainStates.UPW:
+                    if( (frameCount - this.currFrame) === 30)
+                    {
+                        this.step++;
+                        this.currFrame = frameCount;
+                    }
+                    if (this.step === 3){this.step = 0}
+                    image(mainChar[this.step], this.position.x- this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    break;
+                case MainStates.DOWNW:
+                    if ((frameCount - this.currFrame) === 30) {
+                        //println(1);
+                        // println(this.currFrame);
+                        // println(this.currFrame2);
+                        this.currFrame = frameCount;
+                        this.step++;
+                    }
+                    if (this.step === 3){this.step = 0}
+                    image(mainChar[this.step + 3], this.position.x- this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    break;
+                default:
+                    break;
+            }
+
+        };
+        MainChar.prototype.move = function(){
+            // Change map threshhold here
+            var mapxMin = 100;
+            var mapxMax = 1100;
+            var mapyMin = 100;
+            var mapyMax = 550;
+            if(keyArray[UP]===1){
+                this.MainStates = 5;
+                if(!checkWallUp()){
+                    if(keyArray[SHIFT]===1){
+                        if (this.position.y + game.yCor <= mapxMin) {
+                            game.yCor += 3;
+                        }
+                        this.position.y-=3;
+                    }
+                    else{
+                        if (this.position.y + game.yCor <= mapxMin) {
+                            game.yCor += 2;
+                        }
+                        this.position.y-=2;
+                    }
+                }
+            }
+            else if(keyArray[DOWN]===1){
+                this.MainStates = 6;
+                if(!checkWallDown()){
+                    if(keyArray[SHIFT]===1){
+                        if (this.position.y + game.yCor >= mapyMax) {
+                            game.yCor -= 3;
+                        }
+                        this.position.y+=3;
+                    }
+                    else{
+                        if (this.position.y + game.yCor >= mapyMax) {
+                            game.yCor -= 2;
+                        }
+                        this.position.y+=2;
+                    }
+                }
+               
+            }
+            else if(keyArray[RIGHT]===1){
+                this.MainStates = 4;
+                if(!checkWallRight()){
+                    if(keyArray[SHIFT]===1){
+                        if (this.position.x + game.xCor >= mapxMax) {
+                            game.xCor -= 3;
+                        }
+                        this.position.x+=3;
+                    }
+                    else{
+                        if (this.position.x + game.xCor >= mapxMax) {
+                            game.xCor -= 2;
+                        }
+                        this.position.x+=2;
+                    }
+                }
+            }
+            else if(keyArray[LEFT]===1){
+                this.MainStates = 3;
+                if(!checkWallLeft()){
+                    if(keyArray[SHIFT]===1){
+                        if (this.position.x + game.xCor <= mapyMin) {
+                            game.xCor += 3;
+                        }
+                        this.position.x-=3;
+                    }
+                    else{
+                        if (this.position.x + game.xCor <= mapyMin) {
+                            game.xCor += 2;
+                        }
+                        this.position.x-=2;
+                    }
+                }
+            }
+        }
 
         gameObj.prototype.initTilemap = function() {
             for (var i = 0; i< this.tilemap.length; i++) {
@@ -327,18 +519,18 @@ var sketchProc = function (processingInstance) {
                             break;
                     }
                 }
-            }        
+            }
         };
         
         gameObj.prototype.move = function(){
-            // if(fakeP.x+this.xCor <= 200 &&keyArray[LEFT] === 1){this.xCor+=2;}
-            // if(fakeP.x+this.xCor  >= 200 &&keyArray[RIGHT] === 1){this.xCor-=2;}
-            // if(fakeP.y+this.yCor  <= 200 &&keyArray[UP] === 1){this.yCor+=2;}
-            // if(fakeP.y+this.yCor  >= 200 &&keyArray[DOWN] === 1){this.yCor-=2;}
+
+            //if(mainChara.position.x+this.xCor <= 20 &&keyArray[LEFT] === 1){println(mainChara.position.x);println(this.xCor);this.xCor+=2;}
+            //if(mainChara.position.x+this.xCor >= 1240 &&keyArray[RIGHT] === 1){this.xCor-=2;}
+            //if(mainChara.position.y+this.yCor <= 40 &&keyArray[UP] === 1){this.yCor+=2;}
+            //if(mainChara.position.y+this.yCor >= 660 &&keyArray[DOWN] === 1){this.yCor-=2;}
         };
 
         var MyPanda = new PandaObj(200, 300);
-        var mainChara;
         var croc = new Croc(600,400);
         var spider = new SpiderObj(800, 400);
         var bullet = new BulletObj(75,150);
@@ -391,11 +583,11 @@ var sketchProc = function (processingInstance) {
                     }
                     break;
                 case 2:  // start game
+                    background(0, 33, 51);
                     pushMatrix();
                     translate(game.xCor,game.yCor);
-                    background(0, 33, 51);
-
-                    if (game.initMap === 0){ mainChara = new MainChar(200,200,100);game.initTilemap();game.initMap = 1;}
+                   
+                    if (game.initMap === 0){ mainChara = new MainChar(350,200,100);game.initTilemap();game.initMap = 1;}
                     for (var i=0; i<game.walls.length; i++) {
                         game.walls[i].draw();
                     }
@@ -404,6 +596,7 @@ var sketchProc = function (processingInstance) {
                     }
                     game.move();
                     mainChara.draw();
+                    mainChara.move();
                     if (keyArray[ENTER] === 1) {
                         state = 0;
                         keyArray[ENTER] = 0;
