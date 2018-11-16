@@ -252,10 +252,10 @@ var sketchProc = function (processingInstance) {
         };
 
 
-        var MyPanda = new PandaObj(200, 300);
-        var mainChara = new MainChar(400,400);
-        var croc = new Croc(600,400);
-        var spider = new SpiderObj(800, 400);
+        var MyPanda = new PandaObj(100, 100);
+        var mainChara = new MainChar(100,500);
+        var croc = new Croc(1000,500);
+        var spider = new SpiderObj(1000, 100);
         var bullet = new BulletObj(75,150);
         var draw = function () {
             switch (state)
@@ -288,6 +288,14 @@ var sketchProc = function (processingInstance) {
                     var f = createFont("monospace");
                     textFont(f);
                     background(51, 33, 51);
+					
+					fill(51, 33, 51);
+					rect(0, 0, 1280, 720);
+                    MyPanda.draw();
+                    mainChara.draw();
+                    croc.draw();
+                    spider.draw();
+					
                     textSize(42);
                     fill(232, 211, 23);
                     text("  _Instruction_ \n", 440, 70);
@@ -299,6 +307,8 @@ var sketchProc = function (processingInstance) {
                     text("             They defeat monsters around the kingdom.              ", 300,420);
                     text("             With the great courage and wisdom.               ",300, 450);
                     text("             the Boss was slayed and Dad was saved.", 300, 480);
+					
+
                     if(keyArray[ENTER]===1){
                         //println(2);
                         state = 0;
@@ -310,10 +320,8 @@ var sketchProc = function (processingInstance) {
                     background(51, 33, 51);
                     fill(51, 33, 51);
                     rect(0, 0, 1280, 720);
-                    MyPanda.draw();
-                    mainChara.draw();
-                    croc.draw();
-                    spider.draw();
+
+
                     if (keyArray[ENTER] === 1) {
                         //println(2);
                         state = 0;
