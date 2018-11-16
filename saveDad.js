@@ -9,6 +9,7 @@ var sketchProc = function (processingInstance) {
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
+                    3 - 
         */
         var state = 0;
         var keyArray = [];
@@ -20,7 +21,6 @@ var sketchProc = function (processingInstance) {
         pandas.push(loadImage("assets/panda_shy.png"));
         pandas.push(loadImage("assets/panda_dead.png"));
         //pandas.push(loadImage("assets/panda_angry1.png"));
-
         var PandaObj = function(x,y){
             this.x = x;
             this.y = y;
@@ -46,7 +46,6 @@ var sketchProc = function (processingInstance) {
             this.pos = 1;
             this.avatar = pandas;
         };
-        
         var MyPandaBullet = new PandaObj(1,1);
         BulletObj.prototype.draw = function() {
             bullet.select();
@@ -71,6 +70,74 @@ var sketchProc = function (processingInstance) {
                 keyArray[ENTER]=0;  
             }
         };
+
+        // game class for initializing wall block grass block and tilemap
+        var wall = loadImage("assets/block_brown_main.png");
+        var grass = loadImage("assets/grassblock1.png");
+        var wallObj = function(x,y){this.x = x;this.y = y;}
+        wallObj.prototype.draw = function(){image(wall, this.x, this.y, 40, 40);}
+        var grassObj = function(x,y){this.x = x;this.y = y;}
+        grassObj.prototype.draw = function(){image(grass, this.x, this.y, 40, 40);}
+        var gameObj = function(){
+            this.tilemap = [ "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", //80
+            "w                  ggggggggggg                      							w",
+            "w                                    w     w                     				w",
+            "w                                    w     w                      				w",
+            "w                                                      w     w                 w",
+            "wwwwwww                      wwwwwwwww     w                   			    w",
+            "wwww              											                    w",
+            "w                 											        wwwwwww     w",
+            "w         wwwwwwww											   gg               w",
+            "w s               											                    w",
+            "w           gg     											            ggggw",
+            "w      gg          											    gg          w",
+            "w             gg   											                w",
+            "w         gg       											              ggw",
+            "w           gg     											        gg      w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w               ww											    w         w     w",
+            "w   w         wwww											   w w       w w    w",
+            "w     w         ww											  w w w     w w w   w",
+            "w																				w",
+            "w       w         											    w         w     w",
+            "wwwwwwwwwww       											    w         w     w",
+            "w       w         											    w         w     w",
+            "w     w           											                    w",
+            "w    w            											                    w",
+            "w       w         											                    w",
+            "wwwwwwwwww        											                    w",
+            "w       w         											                    w",
+            "w     w           											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w    w            											                    w",
+            "w       w         											                    w",
+            "wwwwwwwwww        											                    w",
+            "w       w         											                    w",
+            "w     w           											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "w                 											                    w",
+            "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
+            this.xCor = 0;
+            this.yCor = 0;
+            this.initMap = 0;
+            this.walls = []; this.grasses = [];
+
+        }
+        var game = new gameObj();
 
         mainChar = [];
         mainChar.push(loadImage("assets/main_back.png"));
@@ -97,8 +164,6 @@ var sketchProc = function (processingInstance) {
         textImgs.push(loadImage("assets/save_dad.png"));
         textImgs.push(loadImage("assets/Instruction.png"));
         textImgs.push(loadImage("assets/Start_Adv.png"));
-
-
 
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
@@ -135,7 +200,6 @@ var sketchProc = function (processingInstance) {
             }
         }
 
-
         var MainStates = {
             UP: 1,
             DOWN: 2,
@@ -145,12 +209,12 @@ var sketchProc = function (processingInstance) {
             DOWNW: 6
         };
         
-        var MainChar = function (x, y) {
+        var MainChar = function (x, y,size) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
             this.currFrame2 = frameCount;
             this.step = 0;
-            this.size = 150;
+            this.size = size;
             this.MainStates = MainStates.UP;
         };
 
@@ -251,8 +315,30 @@ var sketchProc = function (processingInstance) {
 
         };
 
+        gameObj.prototype.initTilemap = function() {
+            for (var i = 0; i< this.tilemap.length; i++) {
+                for (var j =0; j < this.tilemap[i].length; j++) {
+                    switch (this.tilemap[i][j]) {
+                        case 'w': 
+                            this.walls.push(new wallObj(j*40, i*40));
+                            break;
+                        case 'g':
+                            this.grasses.push(new grassObj(j*40, i*40));
+                            break;
+                    }
+                }
+            }        
+        };
+        
+        gameObj.prototype.move = function(){
+            // if(fakeP.x+this.xCor <= 200 &&keyArray[LEFT] === 1){this.xCor+=2;}
+            // if(fakeP.x+this.xCor  >= 200 &&keyArray[RIGHT] === 1){this.xCor-=2;}
+            // if(fakeP.y+this.yCor  <= 200 &&keyArray[UP] === 1){this.yCor+=2;}
+            // if(fakeP.y+this.yCor  >= 200 &&keyArray[DOWN] === 1){this.yCor-=2;}
+        };
+
         var MyPanda = new PandaObj(200, 300);
-        var mainChara = new MainChar(400,400);
+        var mainChara;
         var croc = new Croc(600,400);
         var spider = new SpiderObj(800, 400);
         var bullet = new BulletObj(75,150);
@@ -302,35 +388,32 @@ var sketchProc = function (processingInstance) {
                         //println(2);
                         state = 0;
                         keyArray[ENTER] = 0;
-
                     }
                     break;
                 case 2:  // start game
-                    background(51, 33, 51);
-                    fill(51, 33, 51);
-                    rect(0, 0, 1280, 720);
-                    //MyPanda.draw();
-                    //mainChara.draw();
-                    //croc.draw();
-                    //spider.draw();
+                    pushMatrix();
+                    translate(game.xCor,game.yCor);
+                    background(0, 33, 51);
+
+                    if (game.initMap === 0){ mainChara = new MainChar(200,200,100);game.initTilemap();game.initMap = 1;}
+                    for (var i=0; i<game.walls.length; i++) {
+                        game.walls[i].draw();
+                    }
+                    for (i=0; i<game.grasses.length; i++) {
+                        game.grasses[i].draw();
+                    }
+                    game.move();
+                    mainChara.draw();
                     if (keyArray[ENTER] === 1) {
-                        //println(2);
                         state = 0;
                         keyArray[ENTER] = 0;
                     }
+                    popMatrix();
                     break;
 
                 case 3: // Game main screen
                     
-                    break;
-                
-
             }
-
-
         };
-
-
-
     }
 };
