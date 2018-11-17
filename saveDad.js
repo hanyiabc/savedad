@@ -10,9 +10,12 @@ var sketchProc = function (processingInstance) {
                     1 - Instruction
                     2 - Play
         */
-        var state = 0;
+        var state = 4;
         var keyArray = [];
-        var keyReleased = function() {keyArray[keyCode] = 1;};
+        var backgroundImgs = [];
+        var enemies = [];
+        var keyPressed = function () { keyArray[keyCode] = 1; };
+        var keyReleased = function() {keyArray[keyCode] = 0;};
         
         // Panda 
         var pandas = [];
@@ -21,10 +24,21 @@ var sketchProc = function (processingInstance) {
         pandas.push(loadImage("assets/panda_dead.png"));
         //pandas.push(loadImage("assets/panda_angry1.png"));
 
-        var PandaObj = function(x,y){
+        backgroundImgs.push(loadImage("assets/battle_background.png"));
+        backgroundImgs.push(loadImage("assets/status.png"));
+        backgroundImgs.push(loadImage("assets/attack_menu.png"));
+        backgroundImgs.push(loadImage("assets/attack_menu_nf.png"));
+        
+
+        //PandaObj.prototype.currFrame = frameCount;
+        
+        
+        var PandaObj = function (x, y) {
             this.x = x;
             this.y = y;
             this.step = 0;
+            this.HP = 200;
+            this.ATK = 50;
             this.currFrame = frameCount;
         }
         PandaObj.prototype.draw = function(){
@@ -47,6 +61,7 @@ var sketchProc = function (processingInstance) {
             this.avatar = pandas;
         };
         
+
         var MyPandaBullet = new PandaObj(1,1);
         BulletObj.prototype.draw = function() {
             bullet.select();
@@ -102,7 +117,7 @@ var sketchProc = function (processingInstance) {
 
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
-            this.size = 200;
+            this.size = 300;
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
@@ -110,6 +125,9 @@ var sketchProc = function (processingInstance) {
             this.spider.push(loadImage("assets/spider2.png"))
             this.spider.push(loadImage("assets/spider3.png"));
             this.spider.push(loadImage("assets/spider2.png"))
+            this.HP = 500;
+            this.currHP = 500;
+            this.ATK=70;
         }
         SpiderObj.prototype.draw = function () {
             switch (this.state) {
@@ -152,6 +170,9 @@ var sketchProc = function (processingInstance) {
             this.step = 0;
             this.size = 150;
             this.MainStates = MainStates.UP;
+            this.HP=1000;
+            this.currHP = this.HP;
+            this.ATK=40;
         };
 
         var Croc = function (x, y) {
@@ -160,6 +181,10 @@ var sketchProc = function (processingInstance) {
             this.step = 0;
             this.sizeX = 886/4;
             this.sizeY = 625/4;
+            this.HP = 600;
+            this.ATK = 40;
+            this.currHP = this.HP;
+            
         };
 
         Croc.prototype.draw = function () 
@@ -181,6 +206,13 @@ var sketchProc = function (processingInstance) {
                 image(crocImgs[this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);
             }
         }
+
+        MainChar.prototype.drawBattle = function()
+        {
+            image(mainChar[6], this.position.x, this.position.y, this.size, this.size);
+        };
+
+
         MainChar.prototype.draw = function () {
             switch (this.MainStates) {
                 case MainStates.UP:
@@ -251,12 +283,142 @@ var sketchProc = function (processingInstance) {
 
         };
 
+        var mainCharBattle = new MainChar(880,250);
+        mainCharBattle.size = 250;
 
+        var BattleMenuStates = {
+            TURNINGL: 1,
+            TURNINGR: 2,
+            IDLE: 3,
+        };
+
+        var BattleMenuSelection = {
+            ATK: 1,
+            ULR: 2,
+            FLEE: 3,
+            ITEM: 4,
+        };
+
+
+
+        var GameBackground = function () {
+            this.currY = 0;
+            this.menuRotate = 0;
+            this.state = BattleMenuStates.IDLE;
+            this.degreeTurned = 0;
+            this.prevAngle = 0;
+            this.Increment = 0.08;
+            this.selection = BattleMenuSelection.ATK;
+            this.enemyIdx = 0;
+            enemies.push(new SpiderObj(200,200));
+        };
+
+        GameBackground.prototype.draw = function () {
+            image(backgroundImgs[0], 0, this.currY);
+            image(backgroundImgs[0], 0, this.currY + 1440)
+            this.currY--;
+            image(backgroundImgs[1], 980, 420, 300, 300);
+            textSize(38);
+            fill(232, 211, 23);
+            text(mainChara.currHP, 1110, 620);
+            text(mainChara.HP, 1187, 672);
+            textSize(70);
+            text("/", 1183, 657);
+
+            pushMatrix();
+            translate(825, 140);
+            rotate(this.menuRotate);
+            image(backgroundImgs[3], -125, -125, 250, 250);
+            popMatrix();
+
+            for (var i=0; i<enemies.length; i++)
+            {
+                enemies[i].draw();
+            }
+
+            mainCharBattle.drawBattle();
+            if (this.currY == -1440) {
+                this.currY = 0;
+            }
+
+        }
+
+        //left/right selection
+        GameBackground.prototype.move = function () 
+        {
+            switch (this.state) {
+                case BattleMenuStates.IDLE:
+                    if(keyArray[LEFT])
+                    {
+                        this.state = BattleMenuStates.TURNINGL;
+                        this.degreeTurned = 0;
+                        this.prevAngle = this.menuRotate;
+                        if(this.selection==BattleMenuSelection.ATK)
+                        {
+                            this.selection = BattleMenuSelection.ITEM;
+                        }
+                        else
+                        {
+                            this.selection--;
+                        }
+                    }
+                    else if (keyArray[RIGHT])
+                    {
+                        this.state = BattleMenuStates.TURNINGR;
+                        this.degreeTurned = 0;
+                        this.prevAngle = this.menuRotate;
+                        if (this.selection == BattleMenuSelection.ITEM) {
+                            this.selection = BattleMenuSelection.ATK;
+                        }
+                        else {
+                            this.selection++;
+                        }
+                    }
+
+                    else if(keyArray[ENTER])
+                    {
+                        switch (this.selection) {
+                            case BattleMenuSelection.ATK:
+                                enemies[0].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1); 
+                                break;
+                            case BattleMenuSelection.ITEM:
+                                break;
+                            case BattleMenuSelection.FLEE:
+                                break;
+                            case BattleMenuSelection.ULR:
+                                break;
+                        }
+                    }
+
+                    break;
+                case BattleMenuStates.TURNINGL:
+                    this.menuRotate += this.Increment;
+                    this.degreeTurned += this.Increment;
+                    if(this.degreeTurned > PI/2)
+                    {
+                        this.state = BattleMenuStates.IDLE;
+                        this.menuRotate = PI / 2 + this.prevAngle;
+                    }
+                    break;
+                case BattleMenuStates.TURNINGR:
+                    this.menuRotate -= this.Increment;
+                    this.degreeTurned += this.Increment;
+                    if (this.degreeTurned > PI / 2) {
+                        this.state = BattleMenuStates.IDLE;
+                        this.menuRotate = this.prevAngle - PI / 2;
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+        }
+        var mainChara = new MainChar(400, 400);        
         var MyPanda = new PandaObj(200, 300);
-        var mainChara = new MainChar(400,400);
         var croc = new Croc(600,400);
         var spider = new SpiderObj(800, 400);
         var bullet = new BulletObj(75,150);
+        var battleBack = new GameBackground();
         var draw = function () {
             switch (state)
             {
@@ -323,6 +485,14 @@ var sketchProc = function (processingInstance) {
 
                 case 3: // 
                     break;
+                case 4:
+                    background(255,255,255);
+                    rect(0,0,1280,720);
+                    battleBack.draw();
+                    battleBack.move();
+                    break;
+                default:
+                    break;
 
             }
 
@@ -333,3 +503,5 @@ var sketchProc = function (processingInstance) {
 
     }
 };
+var canvas = document.getElementById("mycanvas");
+var processingInstance = new Processing(canvas, sketchProc); 
