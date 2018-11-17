@@ -1,91 +1,187 @@
 // Name: Guan Congyi, Han Yi, Pan Jiacong
-
 var sketchProc = function (processingInstance) {
     with (processingInstance) {
         size(1280, 720);
         frameRate(60);
         angleMode = "radiant";
-        
+
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
         */
 
-        var state = 0;
+        var state = 5;
         var keyArray = [];
-        var keyPressed = function() {keyArray[keyCode] = 1;};
-        var keyReleased = function() {keyArray[keyCode] = 0;};
-        
-        // Panda 
+        var releaseArray = [];
+        var backgroundImgs = [];
+        var enemies = [];
+        var particles = [];
         var pandas = [];
-        pandas.push(loadImage("assets/panda.png"));
-        pandas.push(loadImage("assets/panda_shy.png"));
-        pandas.push(loadImage("assets/panda_dead.png"));
-        //pandas.push(loadImage("assets/panda_angry1.png"));
-        var PandaObj = function(x,y){
+        var mainChar = [];
+        var crocImgs = [];
+        var textImgs = [];
+        var bigCastle = [];
+        var smallCastle = [];
+        var initialized=0;
+        var wall; var grass; var brick;
+
+        var keyPressed = function () { keyArray[keyCode] = 1; };
+        var keyReleased = function () { keyArray[keyCode] = 0; releaseArray[keyCode] = 1; };
+        var BagObj = function () {
+            this.numofPotion = 3;
+            this.numofRevive = 1;
+        };
+
+        var initialize = function()
+        {
+            if(!initialize)
+            {
+                initialize=1;
+                // Panda 
+                pandas.push(loadImage("assets/panda.png"));
+                pandas.push(loadImage("assets/panda_shy.png"));
+                pandas.push(loadImage("assets/panda_dead.png"));
+
+                backgroundImgs.push(loadImage("assets/battle_background.png"));
+                backgroundImgs.push(loadImage("assets/status.png"));
+                backgroundImgs.push(loadImage("assets/attack_menu.png"));
+                backgroundImgs.push(loadImage("assets/attack_menu_nf.png"));
+                backgroundImgs.push(loadImage("assets/battle_backv2.png"));
+
+                mainChar.push(loadImage("assets/main_back.png"));
+                mainChar.push(loadImage("assets/main_back_f1.png"));
+                mainChar.push(loadImage("assets/main_back_f2.png"));
+
+                mainChar.push(loadImage("assets/main_front.png"));
+                mainChar.push(loadImage("assets/main_front_f1.png"));
+                mainChar.push(loadImage("assets/main_front_f2.png"));
+
+                mainChar.push(loadImage("assets/main_left.png"));
+                mainChar.push(loadImage("assets/main_right.png"));
+
+
+                crocImgs.push(loadImage("assets/monster1_f1.png"));
+                crocImgs.push(loadImage("assets/monster1_f2.png"));
+                crocImgs.push(loadImage("assets/monster1_f3.png"));
+                crocImgs.push(loadImage("assets/monster1_f4.png"));
+                crocImgs.push(loadImage("assets/monster1_f5.png"));
+                crocImgs.push(loadImage("assets/monster1_f6.png"));
+
+                textImgs.push(loadImage("assets/save_dad.png"));
+                textImgs.push(loadImage("assets/Instruction.png"));
+                textImgs.push(loadImage("assets/Start_Adv.png"));
+
+                bigCastle.push(loadImage("assets/bigcastle_blue.png"));
+                bigCastle.push(loadImage("assets/bigcastle_green.png"));
+                bigCastle.push(loadImage("assets/bigcastle_orange.png"));
+                bigCastle.push(loadImage("assets/bigcastle_purple.png"));
+                bigCastle.push(loadImage("assets/bigcastle_red.png"));
+                bigCastle.push(loadImage("assets/bigcastle_yellow.png"));
+
+                smallCastle.push(loadImage("assets/smallcastle_red_blue.png"));
+                smallCastle.push(loadImage("assets/smallcastle_red_green.png"));
+                smallCastle.push(loadImage("assets/smallcastle_red_orange.png"));
+                smallCastle.push(loadImage("assets/smallcastle_red_yellow.png"));
+                // game class for initializing wall block grass block and tilemap
+
+                wall= loadImage("assets/block_brown_main.png");
+                grass = loadImage("assets/grassblock1.png");
+                brick = loadImage("assets/wall_castle.png");
+            }
+            if (mouseClicked) {
+                state = 0;
+            }
+        };
+
+        
+        var particleObj = function (x, y) {
+            this.position = new PVector(x, y);
+            //this.velocity = new PVector(random(-0.5, 0.5), random(-0.5, 0.5));	// cartesian
+            this.velocity = new PVector(random(0, TWO_PI), random(-0.5, 0.5));
+            this.size = random(1, 30);
+            this.c1 = random(155, 255);
+            this.c2 = random(0, 255);
+            this.timeLeft = 50;
+        };
+        particleObj.prototype.move = function () {
+            var v = new PVector(this.velocity.y * cos(this.velocity.x),
+                this.velocity.y * sin(this.velocity.x));
+
+            this.position.add(v);
+            //this.position.add(this.velocity);	// cartesian
+            this.timeLeft--;
+        };
+
+        particleObj.prototype.draw = function () {
+            noStroke();
+            fill(this.c1, this.c2, 0, this.timeLeft);
+            ellipse(this.position.x, this.position.y, this.size, this.size);
+        };
+
+
+        var PandaObj = function (x, y) {
             this.x = x;
             this.y = y;
             this.step = 0;
+            this.HP = 200;
+            this.ATK = 50;
             this.currFrame = frameCount;
         }
-        PandaObj.prototype.draw = function(){
-            if(this.step<3){
+        PandaObj.prototype.draw = function () {
+            if (this.step < 3) {
                 image(pandas[this.step], this.x, this.y, 100, 60);
-                if(frameCount-this.currFrame>30){
+                if (frameCount - this.currFrame > 30) {
                     this.currFrame = frameCount;
                     this.step++;
                 }
             }
-            else{
+            else {
                 this.step = 0;
             }
-        }
+        };
         //Create Bullet
-        var BulletObj = function(x,y){
+        var BulletObj = function (x, y) {
             this.x = x;
             this.y = y;
             this.pos = 1;
             this.avatar = pandas;
         };
-        var MyPandaBullet = new PandaObj(1,1);
-        BulletObj.prototype.draw = function() {
+        var MyPandaBullet = new PandaObj(1, 1);
+        BulletObj.prototype.draw = function () {
             bullet.select();
             // set bullet position
-            if (this.pos === 1){this.x = 400;this.y = 500;}
-            if (this.pos === 2){this.x = 400;this.y = 540;}
+            if (this.pos === 1) { this.x = 400; this.y = 500; }
+            if (this.pos === 2) { this.x = 400; this.y = 540; }
             MyPandaBullet.draw();
-            MyPandaBullet.x = this.x; MyPandaBullet.y =  this.y;
+            MyPandaBullet.x = this.x; MyPandaBullet.y = this.y;
         };
-        BulletObj.prototype.select = function(){
-            if(keyArray[UP]===1){
-                if(this.pos !== 1){this.pos-=1;}
-                keyArray[UP]=0;
+        BulletObj.prototype.select = function () {
+            if (keyArray[UP] === 1) {
+                if (this.pos !== 1) { this.pos -= 1; }
+                keyArray[UP] = 0;
             }
-            if(keyArray[DOWN]===1){
-                if(this.pos !== 2){this.pos+=1;}
-                keyArray[DOWN]=0;
+            if (keyArray[DOWN] === 1) {
+                if (this.pos !== 2) { this.pos += 1; }
+                keyArray[DOWN] = 0;
             }
-            if(keyArray[ENTER]===1){
-                if(this.pos === 1){state = 1;}
-                if(this.pos === 2){state = 2;}
-                keyArray[ENTER]=0;  
+            if (keyArray[ENTER] === 1) {
+                if (this.pos === 1) { state = 1; }
+                if (this.pos === 2) { state = 2; }
+                keyArray[ENTER] = 0;
             }
         };
 
-        // game class for initializing wall block grass block and tilemap
-        var wall = loadImage("assets/block_brown_main.png");
-        var grass = loadImage("assets/grassblock1.png");
-        var brick = loadImage("assets/wall_castle.png");
-        var wallObj = function(x,y){this.x = x;this.y = y;this.size = 40}
-        wallObj.prototype.draw = function(){image(wall, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
-        var grassObj = function(x,y){this.x = x;this.y = y;this.size = 40}
-        grassObj.prototype.draw = function(){image(grass, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
-        var brickObj = function(x,y){this.x = x;this.y = y;this.size = 40}
-        brickObj.prototype.draw = function(){image(brick, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
-        var gameObj = function(){
+
+        var wallObj = function (x, y) { this.x = x; this.y = y; this.size = 40 }
+        wallObj.prototype.draw = function () { image(wall, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size); }
+        var grassObj = function (x, y) { this.x = x; this.y = y; this.size = 40 }
+        grassObj.prototype.draw = function () { image(grass, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size); }
+        var brickObj = function (x, y) { this.x = x; this.y = y; this.size = 40 }
+        brickObj.prototype.draw = function () { image(brick, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size); }
+        var gameObj = function () {
             //64 36
-            this.tilemap = [ 
-                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", 
+            this.tilemap = [
+                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
                 "w                wwwwwwww           wwwwwww                    w",
                 "w                wwbbbbww           wwbbbww                    w",
                 "w                wwbbbbww           wwbbbww            wwwwwwwww",
@@ -121,97 +217,62 @@ var sketchProc = function (processingInstance) {
                 "wwwwww                   gggggggg                              w",
                 "wwwwww                   gggggggg                              w",
                 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
-    
+
             this.xCor = 0;
             this.yCor = 0;
             this.initMap = 0;
-            this.walls = []; 
+            this.walls = [];
             this.grasses = [];
             this.bricks = [];
             this.randPos = [];
 
-        }
+        };
         var game = new gameObj();
 
-        mainChar = [];
-        mainChar.push(loadImage("assets/main_back.png"));
-        mainChar.push(loadImage("assets/main_back_f1.png"));
-        mainChar.push(loadImage("assets/main_back_f2.png"));
-
-        mainChar.push(loadImage("assets/main_front.png"));
-        mainChar.push(loadImage("assets/main_front_f1.png"));
-        mainChar.push(loadImage("assets/main_front_f2.png"));
-
-        mainChar.push(loadImage("assets/main_left.png"));
-        mainChar.push(loadImage("assets/main_right.png"));
+        
 
 
-        var crocImgs = [];
-        crocImgs.push(loadImage("assets/monster1_f1.png"));
-        crocImgs.push(loadImage("assets/monster1_f2.png"));
-        crocImgs.push(loadImage("assets/monster1_f3.png"));
-        crocImgs.push(loadImage("assets/monster1_f4.png"));
-        crocImgs.push(loadImage("assets/monster1_f5.png"));
-        crocImgs.push(loadImage("assets/monster1_f6.png"));
+        
 
-        var textImgs = [];
-        textImgs.push(loadImage("assets/save_dad.png"));
-        textImgs.push(loadImage("assets/Instruction.png"));
-        textImgs.push(loadImage("assets/Start_Adv.png"));
-
-        var bigCastle = [];
-        bigCastle.push(loadImage("assets/bigcastle_blue.png"));
-        bigCastle.push(loadImage("assets/bigcastle_green.png"));
-        bigCastle.push(loadImage("assets/bigcastle_orange.png"));
-        bigCastle.push(loadImage("assets/bigcastle_purple.png"));
-        bigCastle.push(loadImage("assets/bigcastle_red.png"));
-        bigCastle.push(loadImage("assets/bigcastle_yellow.png"));
-
-        var smallCastle = [];
-        smallCastle.push(loadImage("assets/smallcastle_red_blue.png"));
-        smallCastle.push(loadImage("assets/smallcastle_red_green.png"));
-        smallCastle.push(loadImage("assets/smallcastle_red_orange.png"));
-        smallCastle.push(loadImage("assets/smallcastle_red_yellow.png"));
-
-        var bigCObj = function(x,y){
+        var bigCObj = function (x, y) {
             this.x = x;
             this.y = y;
             this.step = 0;
             this.currFrame = frameCount;
-        }
-        bigCObj.prototype.draw = function(){
-            if(this.step<6){
+        };
+        bigCObj.prototype.draw = function () {
+            if (this.step < 6) {
                 image(bigCastle[this.step], this.x, this.y, 1300, 800);
-                if(frameCount-this.currFrame>30){
+                if (frameCount - this.currFrame > 30) {
                     this.currFrame = frameCount;
                     this.step++;
                 }
             }
-            else{
+            else {
                 this.step = 0;
             }
-        }
-        var smallCObj = function(x,y){
+        };
+        var smallCObj = function (x, y) {
             this.x = x;
             this.y = y;
             this.step = 0;
             this.currFrame = frameCount;
-        }
-        smallCObj.prototype.draw = function(){
-            if(this.step<4){
+        };
+        smallCObj.prototype.draw = function () {
+            if (this.step < 4) {
                 image(smallCastle[this.step], this.x, this.y, 600, 550);
-                if(frameCount-this.currFrame>30){
+                if (frameCount - this.currFrame > 30) {
                     this.currFrame = frameCount;
                     this.step++;
                 }
             }
-            else{
+            else {
                 this.step = 0;
             }
-        }
+        };
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
-            this.size = 200;
+            this.size = 300;
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
@@ -219,7 +280,11 @@ var sketchProc = function (processingInstance) {
             this.spider.push(loadImage("assets/spider2.png"))
             this.spider.push(loadImage("assets/spider3.png"));
             this.spider.push(loadImage("assets/spider2.png"))
-        }
+            this.HP = 500;
+            this.currHP = 500;
+            this.ATK = 70;
+            this.pixMoved = 0;
+        };
         SpiderObj.prototype.draw = function () {
             switch (this.state) {
                 case 0:
@@ -232,62 +297,63 @@ var sketchProc = function (processingInstance) {
                     image(this.spider[2], this.position.x, this.position.y, this.size, this.size);
                     break;
             }
-            if(this.state<3){
+            if (this.state < 3) {
                 //image(this.spider[this.state], this.x, this.y, 240, 160);
-                if(frameCount-this.currFrame>30){
+                if (frameCount - this.currFrame > 30) {
                     this.currFrame = frameCount;
                     this.state++;
                 }
             }
-            else{
+            else {
                 this.state = 0;
             }
-        }
+        };
         var Croc = function (x, y) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
             this.step = 0;
-            this.sizeX = 886/4;
-            this.sizeY = 625/4;
+            this.sizeX = 886 / 4;
+            this.sizeY = 625 / 4;
+            this.HP = 600;
+            this.ATK = 40;
+            this.currHP = this.HP;
         };
-        Croc.prototype.draw = function () 
-        {
+        Croc.prototype.draw = function () {
             if (frameCount - this.currFrame > 5) {
                 this.step++;
                 this.currFrame = frameCount;
             }
-            if(this.step > 11)
-            {
+            if (this.step > 11) {
                 this.step = 0;
             }
-            if(this.step > 5)
-            {
-                image(crocImgs[11-this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);                
+            if (this.step > 5) {
+                image(crocImgs[11 - this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);
             }
-            else
-            {
+            else {
                 image(crocImgs[this.step], this.position.x, this.position.y, this.sizeX, this.sizeY);
             }
-        }
+        };
 
         // Maincharacter
-        var mainChara;
         var MainStates = {
             UP: 1,
             DOWN: 2,
             LEFT: 3,
-            RIGHT: 4, 
-            UPW: 5, 
+            RIGHT: 4,
+            UPW: 5,
             DOWNW: 6
         };
 
-        var MainChar = function (x, y,size) {
+        var MainChar = function (x, y, size) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
             this.currFrame2 = frameCount;
             this.step = 0;
             this.size = size;
             this.MainStates = MainStates.UPW;
+            this.HP = 1000;
+            this.currHP = this.HP;
+            this.ATK = 40;
         };
 
         //functions for checking wall
@@ -296,19 +362,18 @@ var sketchProc = function (processingInstance) {
                 if (
                     (
                         (
-                            (mainChara.position.x - mainChara.size  / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
+                            (mainChara.position.x - mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
                             (mainChara.position.x - mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
-                        )||
+                        ) ||
                         (
                             (mainChara.position.x + mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2) &&
                             (mainChara.position.x + mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
                         )
-                    ) && 
+                    ) &&
                     (mainChara.position.y - 2 - mainChara.size / 2) >= (game.walls[i].y + game.walls[i].size / 2 - 3) &&
                     (mainChara.position.y - 2 - mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
-                    )
-                {
-                    return  true;
+                ) {
+                    return true;
                 }
 
             }
@@ -321,16 +386,15 @@ var sketchProc = function (processingInstance) {
                         (
                             (mainChara.position.y - mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
                             (mainChara.position.y - mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
-                        )||
+                        ) ||
                         (
                             (mainChara.position.y + mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
                             (mainChara.position.y + mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
                         )
-                    )&&
+                    ) &&
                     (mainChara.position.x + 2 + mainChara.size / 2) <= (game.walls[i].x - game.walls[i].size / 2 + 3) &&
                     (mainChara.position.x + 2 + mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2)
-                )
-                {
+                ) {
                     return true;
                 }
 
@@ -352,15 +416,13 @@ var sketchProc = function (processingInstance) {
                     ) &&
                     (mainChara.position.x - 2 - mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2) &&
                     (mainChara.position.x - 2 - mainChara.size / 2) >= (game.walls[i].x + game.walls[i].size / 2 - 3)
-                )
-                {
+                ) {
                     return true;
                 }
 
             }
         };
-        var checkWallDown = function ()
-        {
+        var checkWallDown = function () {
             for (var i = 0; i < game.walls.length; i++) {
                 if (
                     (
@@ -375,21 +437,22 @@ var sketchProc = function (processingInstance) {
                     ) &&
                     (mainChara.position.y + 2 + mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
                     (mainChara.position.y + 2 + mainChara.size / 2) <= (game.walls[i].y - game.walls[i].size / 2 + 3)
-                )
-                {
+                ) {
                     return true;
                 }
 
             }
         };
 
-        // for starting screen
+        MainChar.prototype.drawBattle = function () {
+            image(mainChar[6], this.position.x, this.position.y, this.size, this.size);
+        };
+
         MainChar.prototype.disp = function () {
             switch (this.MainStates) {
                 case MainStates.UP:
                     image(mainChar[0], this.position.x, this.position.y, this.size, this.size);
-                    if(frameCount - this.currFrame > 60)
-                    {
+                    if (frameCount - this.currFrame > 60) {
                         this.MainStates++;
                         this.currFrame = frameCount;
                     }
@@ -421,13 +484,11 @@ var sketchProc = function (processingInstance) {
                         this.step = 0;
                         //this.currFrame = frameCount;
                     }
-                    else if(frameCount - this.currFrame === 30)
-                    {
-                        this.step=1;
+                    else if (frameCount - this.currFrame === 30) {
+                        this.step = 1;
                         this.currFrame = frameCount;
                     }
-                    if(frameCount - this.currFrame2 > 120)
-                    {
+                    if (frameCount - this.currFrame2 > 120) {
                         this.currFrame2 = frameCount;
                         this.MainStates++;
                     }
@@ -453,22 +514,355 @@ var sketchProc = function (processingInstance) {
             }
 
         };
+
+        var mainCharBattle = new MainChar(880, 300);
+        mainCharBattle.size = 250;
+
+        var BattleMenuStates = {
+            TURNINGL: 1,
+            TURNINGR: 2,
+            IDLE: 3,
+            INBAG: 4,
+            CHOSEN: 5,
+            ENEMYATK: 6,
+            WON: 7,
+            LOST: 8,
+            ATKING: 9,
+            ATKED: 10,
+            ENEATKING: 11,
+            ENEATKED: 12
+        };
+
+        var BattleMenuSelection = {
+            ATK: 1,
+            ULR: 2,
+            FLEE: 3,
+            ITEM: 4,
+        };
+
+
+        var bag = new BagObj
+        var GameBackground = function () {
+            this.currY = 0;
+            this.menuRotate = 0;
+            this.state = BattleMenuStates.IDLE;
+            this.degreeTurned = 0;
+            this.prevAngle = 0;
+            this.Increment = 0.08;
+            this.selection = BattleMenuSelection.ATK;
+            this.enemyIdx = 0;
+            enemies.push(new SpiderObj(200, 350));
+            this.bagSelection = 0;
+            this.pixMoved = 0;
+        };
+
+        GameBackground.prototype.draw = function () {
+            image(backgroundImgs[0], 0, this.currY);
+            image(backgroundImgs[0], 0, this.currY + 1440)
+            image(backgroundImgs[4], 0, -50);
+            this.currY--;
+            image(backgroundImgs[1], 980, 420, 300, 300);
+            textSize(38);
+            fill(232, 211, 23);
+            text(mainCharBattle.currHP, 1110, 620);
+            text(mainCharBattle.HP, 1187, 672);
+            textSize(70);
+            text("/", 1183, 657);
+
+            pushMatrix();
+            translate(1015, 150);
+            rotate(this.menuRotate);
+            image(backgroundImgs[3], -125, -125, 250, 250);
+            popMatrix();
+
+
+            for (var i = 0; i < enemies.length; i++) {
+                if (enemies[i].currHP > 0) {
+                    enemies[i].draw();
+                    pushMatrix();
+                    translate(enemies[i].position.x, enemies[i].position.y + enemies[i].size);
+                    noFill();
+                    strokeWeight(3);
+                    rect(0, 0, 150, 10);
+                    fill(0, 255, 0);
+                    var temp = 150 * (enemies[i].currHP / enemies[i].HP);
+                    if (temp < 0) {
+                        temp = 0;
+                    }
+                    rect(0, 0, temp, 10);
+
+                    popMatrix();
+                }
+
+            }
+
+            mainCharBattle.drawBattle();
+            if (this.currY == -1440) {
+                this.currY = 0;
+            }
+            for (var i = 0; i < particles.length; i++) {
+                if (particles[i].timeLeft > 0) {
+                    particles[i].draw();
+                    particles[i].move();
+                }
+                else {
+                    particles.splice(i, 1);
+                }
+            }
+
+        };
+
+        //left/right selection
+        GameBackground.prototype.move = function () {
+            switch (this.state) {
+                case BattleMenuStates.IDLE:
+                    if (releaseArray[LEFT]) {
+                        releaseArray[LEFT] = 0;
+                        this.state = BattleMenuStates.TURNINGL;
+                        this.degreeTurned = 0;
+                        this.prevAngle = this.menuRotate;
+                        if (this.selection == BattleMenuSelection.ATK) {
+                            this.selection = BattleMenuSelection.ITEM;
+                        }
+                        else {
+                            this.selection--;
+                        }
+                    }
+                    else if (releaseArray[RIGHT]) {
+                        releaseArray[RIGHT] = 0;
+                        this.state = BattleMenuStates.TURNINGR;
+                        this.degreeTurned = 0;
+                        this.prevAngle = this.menuRotate;
+                        if (this.selection == BattleMenuSelection.ITEM) {
+                            this.selection = BattleMenuSelection.ATK;
+                        }
+                        else {
+                            this.selection++;
+                        }
+                    }
+
+                    else if (releaseArray[ENTER]) {
+                        releaseArray[ENTER] = 0;
+                        switch (this.selection) {
+                            case BattleMenuSelection.ATK:
+                                this.state = BattleMenuStates.ATKING;
+                                break;
+                            case BattleMenuSelection.ITEM:
+                                this.state = BattleMenuStates.INBAG
+                                break;
+                            case BattleMenuSelection.FLEE:
+                                break;
+                            case BattleMenuSelection.ULR:
+                                this.state = BattleMenuStates.ENEMYATK;
+                                break;
+                        }
+
+
+                    }
+
+                    break;
+                case BattleMenuStates.TURNINGL:
+                    this.menuRotate += this.Increment;
+                    this.degreeTurned += this.Increment;
+                    if (this.degreeTurned > PI / 2) {
+                        this.state = BattleMenuStates.IDLE;
+                        this.menuRotate = PI / 2 + this.prevAngle;
+                    }
+                    break;
+                case BattleMenuStates.TURNINGR:
+                    this.menuRotate -= this.Increment;
+                    this.degreeTurned += this.Increment;
+                    if (this.degreeTurned > PI / 2) {
+                        this.state = BattleMenuStates.IDLE;
+                        this.menuRotate = this.prevAngle - PI / 2;
+                    }
+                    break;
+                case BattleMenuStates.INBAG:
+
+                    if (releaseArray[UP]) {
+                        releaseArray[UP] = 0;
+                        if (this.bagSelection == 0) {
+                            this.bagSelection = 2;
+                        }
+                        else {
+                            this.bagSelection--;
+                        }
+                    }
+                    else if (releaseArray[DOWN]) {
+                        releaseArray[DOWN] = 0;
+                        if (this.bagSelection == 2) {
+                            this.bagSelection = 0;
+                        }
+                        else {
+                            this.bagSelection++;
+                        }
+                    }
+                    strokeWeight(3);
+                    rect(300, 20, 700, 300);
+                    strokeWeight(1);
+                    fill(255, 255, 0);
+                    rect(320, 65 + 30 * this.bagSelection, 640, 25);
+
+                    textSize(24);
+                    fill(0, 0, 0);
+                    text("Item                                                           Count", 380, 50);
+                    text("Potion:                                                        ", 380, 85);
+                    text("Life Potion:                                                   ", 380, 115);
+                    text(bag.numofPotion, 830, 85);
+                    text(bag.numofRevive, 830, 115);
+                    text("Back", 380, 145);
+                    switch (this.bagSelection) {
+                        case 0:
+                            text("Potion: Recover 500 HP", 380, 200);
+                            break;
+                        case 1:
+                            text("Life Potion: Revive and Recover 100 HP", 380, 200);
+                            break;
+                        case 2:
+                            text("Go Back", 380, 200);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (releaseArray[ENTER]) {
+                        releaseArray[ENTER] = 0;
+                        switch (this.bagSelection) {
+                            case 0:
+                                if (bag.numofPotion > 0) {
+                                    bag.numofPotion--;
+                                    mainCharBattle.currHP += 500;
+                                    if (mainCharBattle.currHP >= mainCharBattle.HP) {
+                                        mainCharBattle.currHP = mainCharBattle.HP;
+                                    }
+                                    this.state = BattleMenuStates.ENEATKING;
+                                }
+
+                                break;
+                            case 1:
+                                if (bag.numofRevive > 0) {
+                                    bag.numofRevive--;
+                                    mainCharBattle.currHP += 500;
+                                    if (mainCharBattle.currHP >= mainCharBattle.HP) {
+                                        mainCharBattle.currHP = mainCharBattle.HP;
+                                    }
+                                    this.state = BattleMenuStates.ENEATKING;
+                                }
+                                break;
+                            case 2:
+                                this.state = BattleMenuStates.IDLE;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ENEMYATK:
+                    for (var i = 0; i < enemies.length; i++) {
+                        mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
+                    }
+                    if (mainCharBattle.currHP < 0) {
+                        mainCharBattle.currHP = 0;
+                        this.state = BattleMenuStates.LOST;
+                    }
+                    this.state = BattleMenuStates.IDLE;
+                    break;
+                case BattleMenuStates.WON:
+                    fill(255, 0, 0);
+                    text("You Won!", 400, 400)
+                    break;
+                case BattleMenuStates.LOST:
+                    fill(255, 0, 0);
+                    text("You Lose!", 400, 400)
+                    break;
+                case BattleMenuStates.ATKING:
+
+                    if (this.pixMoved >= 32) {
+                        if (particles.length == 0) {
+                            enemies[this.enemyIdx].position.x += 16;
+                            this.state = BattleMenuStates.ATKED;
+                            this.pixMoved = 0;
+                        }
+                    }
+                    else if (this.pixMoved >= 16) {
+                        mainCharBattle.position.x += 2;
+                        this.pixMoved += 2;
+                        enemies[this.enemyIdx].position.x -= 2;
+
+                    }
+                    else if (this.pixMoved < 16) {
+                        mainCharBattle.position.x -= 2;
+                        this.pixMoved += 2;
+                    }
+                    if (this.pixMoved == 16) {
+                        for (var i = 0; i < 100; i++) {
+                            particles.push(new particleObj(enemies[this.enemyIdx].position.x, enemies[this.enemyIdx].position.y));
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ATKED:
+                    enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
+                    for (var i = enemies.length - 1; i >= 0; i--) {
+                        if (enemies[i].currHP <= 0) {
+                            enemies.splice(i, 1);
+                        }
+                    }
+                    this.state = BattleMenuStates.ENEATKING;
+                    if (enemies.length == 0) {
+                        this.state = BattleMenuStates.WON;
+                    }
+                    break;
+                case BattleMenuStates.ENEATKING:
+                    if (enemies[this.enemyIdx].pixMoved >= 16) {
+                        mainCharBattle.position.x += 2;
+                        enemies[this.enemyIdx].pixMoved += 2;
+                        enemies[this.enemyIdx].position.x -= 2;
+                        if (enemies[this.enemyIdx].pixMoved >= 32) {
+                            mainCharBattle.position.x -= 16;
+                            this.state = BattleMenuStates.ENEATKED;
+                            enemies[this.enemyIdx].pixMoved = 0;
+                        }
+                    }
+                    else if (enemies[this.enemyIdx].pixMoved < 16) {
+                        enemies[this.enemyIdx].position.x += 2;
+                        enemies[this.enemyIdx].pixMoved += 2;
+                    }
+                    if (enemies[this.enemyIdx].pixMoved == 16) {
+                        for (var i = 0; i < 100; i++) {
+                            particles.push(new particleObj(mainCharBattle.position.x + mainCharBattle.size / 3, mainCharBattle.position.y + mainCharBattle.size / 3));
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ENEATKED:
+                    for (var i = 0; i < enemies.length; i++) {
+                        mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
+                    }
+
+                    this.state = BattleMenuStates.IDLE;
+                    if (mainCharBattle.currHP <= 0) {
+                        mainCharBattle.currHP = 0;
+                        this.state = BattleMenuStates.LOST;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        };
         MainChar.prototype.draw = function () {
             switch (this.MainStates) {
                 case MainStates.LEFT:
-                    image(mainChar[6], this.position.x - this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    image(mainChar[6], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
                     break;
                 case MainStates.RIGHT:
-                    image(mainChar[7], this.position.x- this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    image(mainChar[7], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
                     break;
                 case MainStates.UPW:
-                    if( (frameCount - this.currFrame) === 30)
-                    {
+                    if ((frameCount - this.currFrame) === 30) {
                         this.step++;
                         this.currFrame = frameCount;
                     }
-                    if (this.step === 3){this.step = 0}
-                    image(mainChar[this.step], this.position.x- this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    if (this.step === 3) { this.step = 0 }
+                    image(mainChar[this.step], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
                     break;
                 case MainStates.DOWNW:
                     if ((frameCount - this.currFrame) === 30) {
@@ -478,232 +872,243 @@ var sketchProc = function (processingInstance) {
                         this.currFrame = frameCount;
                         this.step++;
                     }
-                    if (this.step === 3){this.step = 0}
-                    image(mainChar[this.step + 3], this.position.x- this.size/2, this.position.y- this.size/2, this.size, this.size);
+                    if (this.step === 3) { this.step = 0 }
+                    image(mainChar[this.step + 3], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
                     break;
                 default:
                     break;
             }
+            MainChar.prototype.move = function () {
+                // Change map threshhold here
+                var mapxMin = 100;
+                var mapxMax = 700;
+                var mapyMin = 200;
+                var mapyMax = 400;
+                if (keyArray[UP] === 1) {
+                    this.MainStates = 5;
+                    if (!checkWallUp()) {
+                        if (keyArray[SHIFT] === 1) {
+                            if (this.position.y + game.yCor <= mapxMin) {
+                                game.yCor += 4;
+                            }
+                            this.position.y -= 4;
+                        }
+                        else {
+                            if (this.position.y + game.yCor <= mapxMin) {
+                                game.yCor += 2;
+                            }
+                            this.position.y -= 2;
+                        }
+                    }
+                }
+                else if (keyArray[DOWN] === 1) {
+                    this.MainStates = 6;
+                    if (!checkWallDown()) {
+                        if (keyArray[SHIFT] === 1) {
+                            if (this.position.y + game.yCor >= mapyMax) {
+                                game.yCor -= 4;
+                            }
+                            this.position.y += 4;
+                        }
+                        else {
+                            if (this.position.y + game.yCor >= mapyMax) {
+                                game.yCor -= 2;
+                            }
+                            this.position.y += 2;
+                        }
+                    }
 
-        };
-        MainChar.prototype.move = function(){
-            // Change map threshhold here
-            var mapxMin = 100;
-            var mapxMax = 700;
-            var mapyMin = 200;
-            var mapyMax = 400;
-            if(keyArray[UP]===1){
-                this.MainStates = 5;
-                if(!checkWallUp()){
-                    if(keyArray[SHIFT]===1){
-                        if (this.position.y + game.yCor <= mapxMin) {
-                            game.yCor += 4;
+                }
+                else if (keyArray[RIGHT] === 1) {
+                    this.MainStates = 4;
+                    if (!checkWallRight()) {
+                        if (keyArray[SHIFT] === 1) {
+                            if (this.position.x + game.xCor >= mapxMax) {
+                                game.xCor -= 4;
+                            }
+                            this.position.x += 4;
                         }
-                        this.position.y-=4;
-                    }
-                    else{
-                        if (this.position.y + game.yCor <= mapxMin) {
-                            game.yCor += 2;
+                        else {
+                            if (this.position.x + game.xCor >= mapxMax) {
+                                game.xCor -= 2;
+                            }
+                            this.position.x += 2;
                         }
-                        this.position.y-=2;
                     }
                 }
-            }
-            else if(keyArray[DOWN]===1){
-                this.MainStates = 6;
-                if(!checkWallDown()){
-                    if(keyArray[SHIFT]===1){
-                        if (this.position.y + game.yCor >= mapyMax) {
-                            game.yCor -= 4;
+                else if (keyArray[LEFT] === 1) {
+                    this.MainStates = 3;
+                    if (!checkWallLeft()) {
+                        if (keyArray[SHIFT] === 1) {
+                            if (this.position.x + game.xCor <= mapyMin) {
+                                game.xCor += 4;
+                            }
+                            this.position.x -= 4;
                         }
-                        this.position.y+=4;
-                    }
-                    else{
-                        if (this.position.y + game.yCor >= mapyMax) {
-                            game.yCor -= 2;
+                        else {
+                            if (this.position.x + game.xCor <= mapyMin) {
+                                game.xCor += 2;
+                            }
+                            this.position.x -= 2;
                         }
-                        this.position.y+=2;
-                    }
-                }
-               
-            }
-            else if(keyArray[RIGHT]===1){
-                this.MainStates = 4;
-                if(!checkWallRight()){
-                    if(keyArray[SHIFT]===1){
-                        if (this.position.x + game.xCor >= mapxMax) {
-                            game.xCor -= 4;
-                        }
-                        this.position.x+=4;
-                    }
-                    else{
-                        if (this.position.x + game.xCor >= mapxMax) {
-                            game.xCor -= 2;
-                        }
-                        this.position.x+=2;
                     }
                 }
-            }
-            else if(keyArray[LEFT]===1){
-                this.MainStates = 3;
-                if(!checkWallLeft()){
-                    if(keyArray[SHIFT]===1){
-                        if (this.position.x + game.xCor <= mapyMin) {
-                            game.xCor += 4;
-                        }
-                        this.position.x-=4;
-                    }
-                    else{
-                        if (this.position.x + game.xCor <= mapyMin) {
-                            game.xCor += 2;
-                        }
-                        this.position.x-=2;
-                    }
-                }
-            }
-        };
+            };
 
-        gameObj.prototype.initTilemap = function() {
-            for (var i = 0; i< this.tilemap.length; i++) {
-                for (var j =0; j < this.tilemap[i].length; j++) {
-                    switch (this.tilemap[i][j]) {
-                        case 'w': 
-                            this.walls.push(new wallObj(j*40, i*40));
-                            break;
-                        case 'g':
-                            this.grasses.push(new grassObj(j*40, i*40));
-                            break;
-                        case 'b':
-                            this.bricks.push(new brickObj(j*40, i*40));
-                            break; 
+            gameObj.prototype.initTilemap = function () {
+                for (var i = 0; i < this.tilemap.length; i++) {
+                    for (var j = 0; j < this.tilemap[i].length; j++) {
+                        switch (this.tilemap[i][j]) {
+                            case 'w':
+                                this.walls.push(new wallObj(j * 40, i * 40));
+                                break;
+                            case 'g':
+                                this.grasses.push(new grassObj(j * 40, i * 40));
+                                break;
+                            case 'b':
+                                this.bricks.push(new brickObj(j * 40, i * 40));
+                                break;
+                        }
                     }
                 }
-            }
-            for (var i = 0; i < 5; i++){
-                var r = round(random(0, this.grasses.length));
-                //println(r);
-                var pos = new PVector(this.grasses[r].x, this.grasses[r].y);
-                this.randPos.push(pos);
-                println(pos);
-            }
-            
-        };
-
-        gameObj.prototype.metMonster = function(){
-            var distThreshhold = 50;
-            for (var i = 0; i < this.randPos.length; i++){
-                if(dist(this.randPos[i].x, this.randPos[i].y, mainChara.position.x, mainChara.position.y)<distThreshhold){
-                    state = 4;
-                    
+                for (var i = 0; i < 5; i++) {
+                    var r = round(random(0, this.grasses.length));
+                    //println(r);
+                    var pos = new PVector(this.grasses[r].x, this.grasses[r].y);
+                    this.randPos.push(pos);
+                    println(pos);
                 }
-            }
-        }
 
-        var star = function(x, y, d) {
-            noStroke();
-            fill(250, 245, 250);
-            ellipse(x, y, d, d);
-        };
-        
+            };
 
-        var bigC1 = new bigCObj(-50, -50);
-        var smallC1 = new smallCObj(-150,170);
-        var smallC2 = new smallCObj(760,170);
-        var croc1 = new Croc(1050,0); 
-        var mainChara1 = new MainChar(250,500,150);
-        var bullet = new BulletObj(75,150);
-        var draw = function () {
-            switch (state)
+            gameObj.prototype.metMonster = function () {
+                var distThreshhold = 50;
+                for (var i = 0; i < this.randPos.length; i++) {
+                    if (dist(this.randPos[i].x, this.randPos[i].y, mainChara.position.x, mainChara.position.y) < distThreshhold) {
+                        state = 4;
+
+                    }
+                }
+            };
+
+            var star = function (x, y, d) {
+                noStroke();
+                fill(250, 245, 250);
+                ellipse(x, y, d, d);
+            };
+
+
+            var bigC1 = new bigCObj(-50, -50);
+            var smallC1 = new smallCObj(-150, 170);
+            var smallC2 = new smallCObj(760, 170);
+            var croc1 = new Croc(1050, 0);
+            var mainChara1 = new MainChar(250, 500, 150);
+            var bullet = new BulletObj(75, 150);
+            processingInstance.draw = function () 
             {
-                case 0: // main screen
-                    var f = createFont("monospace");
-                    // Title
-                    textFont(f);
-                    background(28, 31, 29);
-                    for (var i = 0; i < 500; i++) {
-                        star(random(width), random(height), random(1, 2));
-                    }
-                    bigC1.draw();
-                    smallC1.draw();
-                    smallC2.draw();
-                    mainChara1.disp();
-                    croc1.draw();
-                    textSize(42);
-                    fill(232, 211, 23);
-                    image(textImgs[0],400, -90, 420, 350);
-                    
-                    //bullet point
-                    stroke(228, 237, 59);
-                    strokeWeight(10);
-                    var pos = bullet.draw();
-                    
-                    // Options
-                    textSize(30);
-                    fill(30, 189, 94);
-                    image(textImgs[1], 450, 380, 300, 300);
-                    image(textImgs[2], 450, 420, 300, 300);    
+                switch (state) {
+                    case 0: // main screen
+                        var f = createFont("monospace");
+                        // Title
+                        textFont(f);
+                        background(28, 31, 29);
+                        for (var i = 0; i < 500; i++) {
+                            star(random(width), random(height), random(1, 2));
+                        }
+                        bigC1.draw();
+                        smallC1.draw();
+                        smallC2.draw();
+                        mainChara1.disp();
+                        croc1.draw();
+                        textSize(42);
+                        fill(232, 211, 23);
+                        image(textImgs[0], 400, -90, 420, 350);
 
-                    // Author
-                    textSize(20);
-                    text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 540, 680);
-                    break;
-                case 1:  // instruction
-                    var f = createFont("monospace");
-                    textFont(f);
-                    background(51, 33, 51);
-                   
-                    textSize(42);
-                    fill(232, 211, 23);
-                    text("  _Instruction_ \n", 440, 70);
-                    textSize(25);
-                    text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
-                    text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n" , 300, 240);
-                    text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
-                    text("\n             Iris starts the journey with pet Panda.               ",300, 360);
-                    text("             They defeat monsters around the kingdom.              ", 300,420);
-                    text("             With the great courage and wisdom.               ",300, 450);
-                    text("             the Boss was slayed and Dad was saved.", 300, 480);
-                    if(keyArray[ENTER]===1){
-                        //println(2);
-                        state = 0;
-                        keyArray[ENTER] = 0;
-                    }
-                    break;
-                case 2:  // start game
-                    background(0, 33, 51);
-                    pushMatrix();
-                    translate(game.xCor,game.yCor);
-                   
-                    if (game.initMap === 0){ mainChara = new MainChar(350,200,100);game.initTilemap();game.initMap = 1;}
-                    for (var i=0; i<game.walls.length; i++) {
-                        game.walls[i].draw();
-                    }
-                    for (i=0; i<game.grasses.length; i++) {
-                        game.grasses[i].draw();
-                    }
-                    for (i=0; i<game.bricks.length; i++) {
-                        game.bricks[i].draw();
-                    }
-                    mainChara.draw();
-                    mainChara.move();
-                    game.metMonster();
-                    
-                    if (keyArray[ENTER] === 1) {
-                        state = 0;
-                        keyArray[ENTER] = 0;
-                    }
-                    popMatrix();
-                    break;
+                        //bullet point
+                        stroke(228, 237, 59);
+                        strokeWeight(10);
+                        var pos = bullet.draw();
 
-                case 3: // Game main screen
-                    break;
-                case 4:
-                    background(0, 33, 51);
-                    println("meet monster");
-                    println(this.randPos[i].x);
-                    println(this.randPos[i].y);
-                    break;
-            }
-        };
+                        // Options
+                        textSize(30);
+                        fill(30, 189, 94);
+                        image(textImgs[1], 450, 380, 300, 300);
+                        image(textImgs[2], 450, 420, 300, 300);
+
+                        // Author
+                        textSize(20);
+                        text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 540, 680);
+                        break;
+                    case 1:  // instruction
+                        var f = createFont("monospace");
+                        textFont(f);
+                        background(51, 33, 51);
+
+                        textSize(42);
+                        fill(232, 211, 23);
+                        text("  _Instruction_ \n", 440, 70);
+                        textSize(25);
+                        text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
+                        text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n", 300, 240);
+                        text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
+                        text("\n             Iris starts the journey with pet Panda.               ", 300, 360);
+                        text("             They defeat monsters around the kingdom.              ", 300, 420);
+                        text("             With the great courage and wisdom.               ", 300, 450);
+                        text("             the Boss was slayed and Dad was saved.", 300, 480);
+                        if (keyArray[ENTER] === 1) {
+                            //println(2);
+                            state = 0;
+                            keyArray[ENTER] = 0;
+                        }
+                        break;
+                    case 2:  // start game
+                        background(0, 33, 51);
+                        pushMatrix();
+                        translate(game.xCor, game.yCor);
+
+                        if (game.initMap === 0) { mainChara = new MainChar(350, 200, 100); game.initTilemap(); game.initMap = 1; }
+                        for (var i = 0; i < game.walls.length; i++) {
+                            game.walls[i].draw();
+                        }
+                        for (i = 0; i < game.grasses.length; i++) {
+                            game.grasses[i].draw();
+                        }
+                        for (i = 0; i < game.bricks.length; i++) {
+                            game.bricks[i].draw();
+                        }
+                        mainChara.draw();
+                        mainChara.move();
+                        game.metMonster();
+
+                        if (keyArray[ENTER] === 1) {
+                            state = 0;
+                            keyArray[ENTER] = 0;
+                        }
+                        popMatrix();
+                        break;
+
+                    case 3: // 
+                        image(backgroundImgs[5], 0, 0);
+
+                        break;
+                    case 4:
+                        background(255, 255, 255);
+                        rect(0, 0, 1280, 720);
+                        battleBack.draw();
+                        battleBack.move();
+                        println(this.randPos[i].x);
+                        println(this.randPos[i].y);
+                        break;
+                    case 5:
+                        text("Press Enter To begin", 300,300);
+                        initialize();
+                        break;
+                    default:
+                        break;
+                }
+            };
+        }
     }
 };
+var canvas = document.getElementById("mycanvas");
+var processingInstance = new Processing(canvas, sketchProc); 
