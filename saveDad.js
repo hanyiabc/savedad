@@ -15,11 +15,12 @@ var sketchProc = function (processingInstance) {
         var releaseArray = [];
         var backgroundImgs = [];
         var enemies = [];
+        var particles = [];
         var keyPressed = function () { keyArray[keyCode] = 1; };
         var keyReleased = function () { keyArray[keyCode] = 0; releaseArray[keyCode] = 1; };
-        var bagObj = function () {
-            this.numofPotion = 0;
-            this.numofRevive = 0;
+        var BagObj = function () {
+            this.numofPotion = 3;
+            this.numofRevive = 1;
         }
 
 
@@ -35,11 +36,35 @@ var sketchProc = function (processingInstance) {
         backgroundImgs.push(loadImage("assets/status.png"));
         backgroundImgs.push(loadImage("assets/attack_menu.png"));
         backgroundImgs.push(loadImage("assets/attack_menu_nf.png"));
-
-
+        backgroundImgs.push(loadImage("assets/battle_backv2.png"));
+        
         //PandaObj.prototype.currFrame = frameCount;
 
+        var particleObj = function (x, y) {
+            this.position = new PVector(x, y);
+            //this.velocity = new PVector(random(-0.5, 0.5), random(-0.5, 0.5));	// cartesian
+            this.velocity = new PVector(random(0, TWO_PI), random(-0.5, 0.5));
+            this.size = random(1, 30);
+            this.c1 = random(155, 255);
+            this.c2 = random(0, 255);
+            this.timeLeft = 50;
+        };
+        particleObj.prototype.move = function () {
+            var v = new PVector(this.velocity.y * cos(this.velocity.x),
+                this.velocity.y * sin(this.velocity.x));
 
+            this.position.add(v);
+            //this.position.add(this.velocity);	// cartesian
+            this.timeLeft--;
+        };
+
+        particleObj.prototype.draw = function () {
+            noStroke();
+            fill(this.c1, this.c2, 0, this.timeLeft);
+            ellipse(this.position.x, this.position.y, this.size, this.size);
+        };
+
+        
         var PandaObj = function (x, y) {
             this.x = x;
             this.y = y;
@@ -47,7 +72,7 @@ var sketchProc = function (processingInstance) {
             this.HP = 200;
             this.ATK = 50;
             this.currFrame = frameCount;
-        }
+        };
         PandaObj.prototype.draw = function () {
             if (this.step < 3) {
                 image(pandas[this.step], this.x, this.y, 240, 160);
@@ -59,7 +84,7 @@ var sketchProc = function (processingInstance) {
             else {
                 this.step = 0;
             }
-        }
+        };
         //Create Bullet
         var BulletObj = function (x, y) {
             this.x = x;
@@ -135,6 +160,7 @@ var sketchProc = function (processingInstance) {
             this.HP = 500;
             this.currHP = 500;
             this.ATK = 70;
+            this.pixMoved = 0;
         }
         SpiderObj.prototype.draw = function () {
             switch (this.state) {
@@ -282,7 +308,7 @@ var sketchProc = function (processingInstance) {
 
         };
 
-        var mainCharBattle = new MainChar(880, 250);
+        var mainCharBattle = new MainChar(880, 300);
         mainCharBattle.size = 250;
 
         var BattleMenuStates = {
@@ -290,7 +316,14 @@ var sketchProc = function (processingInstance) {
             TURNINGR: 2,
             IDLE: 3,
             INBAG: 4,
-            CHOSEN: 5
+            CHOSEN: 5,
+            ENEMYATK: 6,
+            WON: 7,
+            LOST: 8, 
+            ATKING: 9, 
+            ATKED: 10, 
+            ENEATKING: 11,
+            ENEATKED: 12
         };
 
         var BattleMenuSelection = {
@@ -301,6 +334,7 @@ var sketchProc = function (processingInstance) {
         };
 
 
+        var bag = new BagObj
         var GameBackground = function () {
             this.currY = 0;
             this.menuRotate = 0;
@@ -310,12 +344,15 @@ var sketchProc = function (processingInstance) {
             this.Increment = 0.08;
             this.selection = BattleMenuSelection.ATK;
             this.enemyIdx = 0;
-            enemies.push(new SpiderObj(200, 200));
+            enemies.push(new SpiderObj(200, 350));
+            this.bagSelection = 0;
+            this.pixMoved = 0;
         };
 
         GameBackground.prototype.draw = function () {
             image(backgroundImgs[0], 0, this.currY);
             image(backgroundImgs[0], 0, this.currY + 1440)
+            image(backgroundImgs[4], 0,-50);
             this.currY--;
             image(backgroundImgs[1], 980, 420, 300, 300);
             textSize(38);
@@ -326,7 +363,7 @@ var sketchProc = function (processingInstance) {
             text("/", 1183, 657);
 
             pushMatrix();
-            translate(825, 140);
+            translate(1015, 150);
             rotate(this.menuRotate);
             image(backgroundImgs[3], -125, -125, 250, 250);
             popMatrix();
@@ -336,7 +373,7 @@ var sketchProc = function (processingInstance) {
                 if (enemies[i].currHP > 0) {
                     enemies[i].draw();
                     pushMatrix();
-                    translate(enemies[i].position.x + enemies[i].size, enemies[i].position.y + enemies[i].size);
+                    translate(enemies[i].position.x, enemies[i].position.y + enemies[i].size);
                     noFill();
                     strokeWeight(3);
                     rect(0, 0, 150, 10);
@@ -356,6 +393,15 @@ var sketchProc = function (processingInstance) {
             if (this.currY == -1440) {
                 this.currY = 0;
             }
+            for (var i = 0; i < particles.length; i++) {
+                if (particles[i].timeLeft > 0) {
+                    particles[i].draw();
+                    particles[i].move();
+                }
+                else {
+                    particles.splice(i, 1);
+                }
+            }
 
         }
 
@@ -363,7 +409,8 @@ var sketchProc = function (processingInstance) {
         GameBackground.prototype.move = function () {
             switch (this.state) {
                 case BattleMenuStates.IDLE:
-                    if (keyArray[LEFT]) {
+                    if (releaseArray[LEFT]) {
+                        releaseArray[LEFT] = 0;
                         this.state = BattleMenuStates.TURNINGL;
                         this.degreeTurned = 0;
                         this.prevAngle = this.menuRotate;
@@ -374,7 +421,8 @@ var sketchProc = function (processingInstance) {
                             this.selection--;
                         }
                     }
-                    else if (keyArray[RIGHT]) {
+                    else if (releaseArray[RIGHT]) {
+                        releaseArray[RIGHT] = 0;
                         this.state = BattleMenuStates.TURNINGR;
                         this.degreeTurned = 0;
                         this.prevAngle = this.menuRotate;
@@ -390,20 +438,18 @@ var sketchProc = function (processingInstance) {
                         releaseArray[ENTER] = 0;
                         switch (this.selection) {
                             case BattleMenuSelection.ATK:
-                                enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
-                                for (var i = 0; i < enemies.length; i++) {
-                                    mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
-
-                                }
+                                this.state = BattleMenuStates.ATKING;
                                 break;
                             case BattleMenuSelection.ITEM:
-                                this.state = BattleMenuSelection.INBAG
+                                this.state = BattleMenuStates.INBAG
                                 break;
                             case BattleMenuSelection.FLEE:
                                 break;
                             case BattleMenuSelection.ULR:
+                                this.state = BattleMenuStates.ENEMYATK;
                                 break;
                         }
+                        
 
                     }
 
@@ -424,12 +470,183 @@ var sketchProc = function (processingInstance) {
                         this.menuRotate = this.prevAngle - PI / 2;
                     }
                     break;
-                case BattleMenuSelection.INBAG:
+                case BattleMenuStates.INBAG:
+                    
+                    if(releaseArray[UP])
+                    {
+                        releaseArray[UP] = 0;
+                        if(this.bagSelection==0)
+                        {
+                            this.bagSelection=2;
+                        }
+                        else
+                        {
+                            this.bagSelection--;
+                        }
+                    }
+                    else if(releaseArray[DOWN])
+                    {
+                        releaseArray[DOWN] = 0;
+                        if (this.bagSelection == 2) {
+                            this.bagSelection = 0;
+                        }
+                        else {
+                            this.bagSelection++;
+                        }
+                    }
+                    strokeWeight(3);
                     rect(300, 20, 700, 300);
+                    strokeWeight(1);
+                    fill(255,255,0);
+                    rect(320, 65 + 30 * this.bagSelection, 640, 25);
+                    
                     textSize(24);
-                    text(, 1183, 657);
+                    fill(0,0,0);
+                    text("Item                                                           Count", 380,50);
+                    text("Potion:                                                        ", 380, 85);
+                    text("Life Potion:                                                   ", 380, 115);
+                    text(bag.numofPotion, 830, 85);
+                    text(bag.numofRevive, 830, 115);
+                    text("Back", 380, 145);
+                    switch (this.bagSelection) {
+                        case 0:
+                            text("Potion: Recover 500 HP", 380, 200); 
+                            break;
+                        case 1:
+                            text("Life Potion: Revive and Recover 100 HP", 380, 200);
+                            break;
+                        case 2:
+                            text("Go Back", 380, 200);
+                            break;
+                        default:
+                            break;
+                    }
 
-
+                    if(releaseArray[ENTER])
+                    {
+                        releaseArray[ENTER]=0;
+                        switch (this.bagSelection) {
+                            case 0:
+                                if (bag.numofPotion > 0)
+                                {
+                                    bag.numofPotion--;
+                                    mainCharBattle.currHP += 500;
+                                    if (mainCharBattle.currHP >= mainCharBattle.HP) {
+                                        mainCharBattle.currHP = mainCharBattle.HP;
+                                    }
+                                    this.state = BattleMenuStates.ENEATKING;
+                                }
+                                
+                                break;
+                            case 1:
+                                if (bag.numofRevive > 0) {
+                                    bag.numofRevive--;
+                                    mainCharBattle.currHP += 500;
+                                    if (mainCharBattle.currHP >= mainCharBattle.HP) {
+                                        mainCharBattle.currHP = mainCharBattle.HP;
+                                    }
+                                    this.state = BattleMenuStates.ENEATKING;
+                                }
+                                break;
+                            case 2:
+                                this.state = BattleMenuStates.IDLE;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ENEMYATK:
+                    for (var i = 0; i < enemies.length; i++) {
+                        mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
+                    }
+                    if (mainCharBattle.currHP < 0) {
+                        mainCharBattle.currHP = 0;
+                        this.state = BattleMenuStates.LOST;
+                    }
+                    this.state = BattleMenuStates.IDLE;
+                    break;
+                case BattleMenuStates.WON:
+                    fill(255,0,0);
+                    text("You Won!", 400,400)
+                    break;
+                case BattleMenuStates.LOST:
+                    fill(255, 0, 0);
+                    text("You Lose!", 400, 400)
+                    break;
+                case BattleMenuStates.ATKING:
+                     
+                    if (this.pixMoved >= 32) {
+                        if (particles.length == 0) {
+                            enemies[this.enemyIdx].position.x += 16;
+                            this.state = BattleMenuStates.ATKED;
+                            this.pixMoved = 0;
+                        }
+                    }
+                    else if(this.pixMoved>=16)
+                    {
+                        mainCharBattle.position.x+=2;
+                        this.pixMoved+=2;
+                        enemies[this.enemyIdx].position.x-=2;
+                        
+                    }
+                    else if(this.pixMoved<16)
+                    {
+                        mainCharBattle.position.x-=2;
+                        this.pixMoved+=2;
+                    }
+                    if(this.pixMoved==16)
+                    {
+                        for (var i = 0; i < 100; i++) {
+                            particles.push(new particleObj(enemies[this.enemyIdx].position.x, enemies[this.enemyIdx].position.y));
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ATKED:
+                    enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
+                    for (var i = enemies.length - 1; i >= 0; i--) {
+                        if (enemies[i].currHP <= 0) {
+                            enemies.splice(i, 1);
+                        }
+                    }
+                    this.state = BattleMenuStates.ENEATKING;
+                    if (enemies.length == 0) {
+                        this.state = BattleMenuStates.WON;
+                    }
+                    break;
+                case BattleMenuStates.ENEATKING:
+                    if (enemies[this.enemyIdx].pixMoved >= 16) {
+                        mainCharBattle.position.x += 2;
+                        enemies[this.enemyIdx].pixMoved += 2;
+                        enemies[this.enemyIdx].position.x -= 2;
+                        if (enemies[this.enemyIdx].pixMoved >= 32) {
+                            mainCharBattle.position.x -= 16;
+                            this.state = BattleMenuStates.ENEATKED;
+                            enemies[this.enemyIdx].pixMoved = 0;
+                        }
+                    }
+                    else if (enemies[this.enemyIdx].pixMoved < 16) {
+                        enemies[this.enemyIdx].position.x += 2;
+                        enemies[this.enemyIdx].pixMoved += 2;
+                    }
+                    if (enemies[this.enemyIdx].pixMoved == 16)
+                    {
+                        for (var i = 0; i < 100; i++) {
+                            particles.push(new particleObj(mainCharBattle.position.x + mainCharBattle.size/3, mainCharBattle.position.y + mainCharBattle.size/3));
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ENEATKED:
+                    for (var i = 0; i < enemies.length; i++) {
+                        mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
+                    }
+                    
+                    this.state = BattleMenuStates.IDLE;
+                    if (mainCharBattle.currHP <= 0) {
+                        mainCharBattle.currHP = 0;
+                        this.state = BattleMenuStates.LOST;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -504,6 +721,8 @@ var sketchProc = function (processingInstance) {
                     break;
 
                 case 3: // 
+                    image(backgroundImgs[5], 0, 0);
+                    
                     break;
                 case 4:
                     background(255, 255, 255);
