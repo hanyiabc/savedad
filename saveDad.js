@@ -30,7 +30,7 @@ var sketchProc = function (processingInstance) {
         }
         PandaObj.prototype.draw = function(){
             if(this.step<3){
-                image(pandas[this.step], this.x, this.y, 240, 160);
+                image(pandas[this.step], this.x, this.y, 100, 60);
                 if(frameCount-this.currFrame>30){
                     this.currFrame = frameCount;
                     this.step++;
@@ -51,8 +51,8 @@ var sketchProc = function (processingInstance) {
         BulletObj.prototype.draw = function() {
             bullet.select();
             // set bullet position
-            if (this.pos === 1){this.x = 350;this.y = 320;}
-            if (this.pos === 2){this.x = 350;this.y = 420;}
+            if (this.pos === 1){this.x = 400;this.y = 500;}
+            if (this.pos === 2){this.x = 400;this.y = 540;}
             MyPandaBullet.draw();
             MyPandaBullet.x = this.x; MyPandaBullet.y =  this.y;
         };
@@ -75,48 +75,51 @@ var sketchProc = function (processingInstance) {
         // game class for initializing wall block grass block and tilemap
         var wall = loadImage("assets/block_brown_main.png");
         var grass = loadImage("assets/grassblock1.png");
+        var brick = loadImage("assets/wall_castle.png");
         var wallObj = function(x,y){this.x = x;this.y = y;this.size = 40}
         wallObj.prototype.draw = function(){image(wall, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
         var grassObj = function(x,y){this.x = x;this.y = y;this.size = 40}
         grassObj.prototype.draw = function(){image(grass, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
+        var brickObj = function(x,y){this.x = x;this.y = y;this.size = 40}
+        brickObj.prototype.draw = function(){image(brick, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
         var gameObj = function(){
-            //64
+            //64 36
             this.tilemap = [ 
                 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", 
                 "w                wwwwwwww           wwwwwww                    w",
-                "w                wwwwwwww           wwwwwww                    w",
-                "w                wwwwwwww           wwwwwww            wwwwwwwww",
-                "wwwwwww          wwwwwwww           wwwwwww            wwwwwwwww",
-                "wwwwwww          wwwwwwww           wwwwwww            wwwwwwwww",
-                "wwwwwwwggggggggggwwwwwwww           ggggggg                    w",
-                "wggggggggggggggggwwwwwwww           ggggggg                    w",
+                "w                wwbbbbww           wwbbbww                    w",
+                "w                wwbbbbww           wwbbbww            wwwwwwwww",
+                "wwwwwww          wwbbbbww           wwwbwww            wwwwwwwww",
+                "wwwwwww          wwbbbbww           wwwwwww            wwwwwwwww",
+                "wwwwwwwggggggggggwwbbbbww           ggggggg                    w",
+                "wggggggggggggggggwwbbbbww           ggggggg                    w",
+                "w                wwbbbbww           ggggggg                    w",
                 "w                wwwwwwww           ggggggg                    w",
-                "w                wwwwwwww           ggggggg                    w",
                 "w                wwwwwwww           wwwwwww                    w",
-                "w                                   wwwwwww                    w",
-                "wwwwwwww                            wwwwwww                    w",
-                "wwwwwwwwggggggggg                   wwwwwww                    w",
+                "w                                   wwwbwww                    w",
+                "wwwwwwww                            wwbbbww                    w",
+                "wwwwwwwwggggggggg                   wwbbbww                    w",
                 "wwwwwwwwggggggggg                   wwwwwww                    w",
                 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww                w",
-                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww                w",
-                "w            wwwwwww                    wwwwwwwggggggggggwwwwwww",
-                "w            wwwwwww                    wwwwwwwggggggggggwwwwwww",
+                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwbbbww                w",
+                "w            wwwwwww                    wwbbbwwggggggggggwwwwwww",
+                "w            wwwwwww                    wwbbbwwggggggggggwwwwwww",
                 "w            wwwwwww                    wwwwwww          wwwwwww",
-                "w                                       wwwwwww                w",
-                "w                                       wwwwwww                w",
+                "w                                                              w",
+                "w                                                              w",
                 "wwwwwwww                                                       w",
-                "wwwwwwww                                                       w",
-                "wwwwwwww                 wwwwwwww                              w",
-                "w                        wwwwwwww                              w",
-                "w                        wwwwwwww                              w",
+                "wwbbbbww                                                       w",
+                "wwwwwwww                 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+                "w                        wwbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbw",
+                "w                        wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
                 "w                 wwwwwwwwwwwwwww                              w",
-                "w                 wwwwwwwwwwwwwww                              w",
-                "w                 wwwwwwwwwwwwwww                              w",
+                "w                 wwwbbbbbbbbbwww                              w",
+                "w                 wwwwwwwwwbbbwww                              w",
+                "w                        wwwbbwww                              w",
                 "w                        wwwwwwww                              w",
-                "w                        wwwwwwww                              w",
-                "w                        wwwwwwwwwwwwwwww                      w",
-                "wwwwww                   wwwwwwwwwwwwwwww                      w",
-                "wwwwww                   wwwwwwwwwwwwwwww                      w",
+                "w                        gggggggg                              w",
+                "wwwwww                   gggggggg                              w",
+                "wwwwww                   gggggggg                              w",
                 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
     
             this.xCor = 0;
@@ -124,6 +127,8 @@ var sketchProc = function (processingInstance) {
             this.initMap = 0;
             this.walls = []; 
             this.grasses = [];
+            this.bricks = [];
+            this.randPos = [];
 
         }
         var game = new gameObj();
@@ -186,7 +191,6 @@ var sketchProc = function (processingInstance) {
                 this.step = 0;
             }
         }
-
         var smallCObj = function(x,y){
             this.x = x;
             this.y = y;
@@ -205,7 +209,6 @@ var sketchProc = function (processingInstance) {
                 this.step = 0;
             }
         }
-
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
             this.size = 200;
@@ -240,7 +243,6 @@ var sketchProc = function (processingInstance) {
                 this.state = 0;
             }
         }
-
         var Croc = function (x, y) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
@@ -248,7 +250,6 @@ var sketchProc = function (processingInstance) {
             this.sizeX = 886/4;
             this.sizeY = 625/4;
         };
-
         Croc.prototype.draw = function () 
         {
             if (frameCount - this.currFrame > 5) {
@@ -488,17 +489,17 @@ var sketchProc = function (processingInstance) {
         MainChar.prototype.move = function(){
             // Change map threshhold here
             var mapxMin = 100;
-            var mapxMax = 1100;
-            var mapyMin = 100;
-            var mapyMax = 550;
+            var mapxMax = 700;
+            var mapyMin = 200;
+            var mapyMax = 400;
             if(keyArray[UP]===1){
                 this.MainStates = 5;
                 if(!checkWallUp()){
                     if(keyArray[SHIFT]===1){
                         if (this.position.y + game.yCor <= mapxMin) {
-                            game.yCor += 3;
+                            game.yCor += 4;
                         }
-                        this.position.y-=3;
+                        this.position.y-=4;
                     }
                     else{
                         if (this.position.y + game.yCor <= mapxMin) {
@@ -513,9 +514,9 @@ var sketchProc = function (processingInstance) {
                 if(!checkWallDown()){
                     if(keyArray[SHIFT]===1){
                         if (this.position.y + game.yCor >= mapyMax) {
-                            game.yCor -= 3;
+                            game.yCor -= 4;
                         }
-                        this.position.y+=3;
+                        this.position.y+=4;
                     }
                     else{
                         if (this.position.y + game.yCor >= mapyMax) {
@@ -531,9 +532,9 @@ var sketchProc = function (processingInstance) {
                 if(!checkWallRight()){
                     if(keyArray[SHIFT]===1){
                         if (this.position.x + game.xCor >= mapxMax) {
-                            game.xCor -= 3;
+                            game.xCor -= 4;
                         }
-                        this.position.x+=3;
+                        this.position.x+=4;
                     }
                     else{
                         if (this.position.x + game.xCor >= mapxMax) {
@@ -548,9 +549,9 @@ var sketchProc = function (processingInstance) {
                 if(!checkWallLeft()){
                     if(keyArray[SHIFT]===1){
                         if (this.position.x + game.xCor <= mapyMin) {
-                            game.xCor += 3;
+                            game.xCor += 4;
                         }
-                        this.position.x-=3;
+                        this.position.x-=4;
                     }
                     else{
                         if (this.position.x + game.xCor <= mapyMin) {
@@ -572,17 +573,31 @@ var sketchProc = function (processingInstance) {
                         case 'g':
                             this.grasses.push(new grassObj(j*40, i*40));
                             break;
+                        case 'b':
+                            this.bricks.push(new brickObj(j*40, i*40));
+                            break; 
                     }
                 }
             }
+            for (var i = 0; i < 5; i++){
+                var r = round(random(0, this.grasses.length));
+                //println(r);
+                var pos = new PVector(this.grasses[r].x, this.grasses[r].y);
+                this.randPos.push(pos);
+                println(pos);
+            }
+            
         };
-        
-        gameObj.prototype.move = function(){
-            //if(mainChara.position.x+this.xCor <= 20 &&keyArray[LEFT] === 1){println(mainChara.position.x);println(this.xCor);this.xCor+=2;}
-            //if(mainChara.position.x+this.xCor >= 1240 &&keyArray[RIGHT] === 1){this.xCor-=2;}
-            //if(mainChara.position.y+this.yCor <= 40 &&keyArray[UP] === 1){this.yCor+=2;}
-            //if(mainChara.position.y+this.yCor >= 660 &&keyArray[DOWN] === 1){this.yCor-=2;}
-        };
+
+        gameObj.prototype.metMonster = function(){
+            var distThreshhold = 50;
+            for (var i = 0; i < this.randPos.length; i++){
+                if(dist(this.randPos[i].x, this.randPos[i].y, mainChara.position.x, mainChara.position.y)<distThreshhold){
+                    state = 4;
+                    
+                }
+            }
+        }
 
         var star = function(x, y, d) {
             noStroke();
@@ -591,11 +606,11 @@ var sketchProc = function (processingInstance) {
         };
         
 
-        var bigC1 = new bigCObj(50, -50);
-        var smallC1 = new smallCObj(-100,200);
-        var smallC2 = new smallCObj(800,200);
-        var croc1 = new Croc(1000,100); 
-        var mainChara1 = new MainChar(100,100,150);
+        var bigC1 = new bigCObj(-50, -50);
+        var smallC1 = new smallCObj(-150,170);
+        var smallC2 = new smallCObj(760,170);
+        var croc1 = new Croc(1050,0); 
+        var mainChara1 = new MainChar(250,500,150);
         var bullet = new BulletObj(75,150);
         var draw = function () {
             switch (state)
@@ -625,8 +640,8 @@ var sketchProc = function (processingInstance) {
                     // Options
                     textSize(30);
                     fill(30, 189, 94);
-                    image(textImgs[1], 300, 100, 600, 600);
-                    image(textImgs[2], 345, 200, 600, 600);    
+                    image(textImgs[1], 450, 380, 300, 300);
+                    image(textImgs[2], 450, 420, 300, 300);    
 
                     // Author
                     textSize(20);
@@ -666,9 +681,13 @@ var sketchProc = function (processingInstance) {
                     for (i=0; i<game.grasses.length; i++) {
                         game.grasses[i].draw();
                     }
-                    game.move();
+                    for (i=0; i<game.bricks.length; i++) {
+                        game.bricks[i].draw();
+                    }
                     mainChara.draw();
                     mainChara.move();
+                    game.metMonster();
+                    
                     if (keyArray[ENTER] === 1) {
                         state = 0;
                         keyArray[ENTER] = 0;
@@ -677,7 +696,13 @@ var sketchProc = function (processingInstance) {
                     break;
 
                 case 3: // Game main screen
-                    
+                    break;
+                case 4:
+                    background(0, 33, 51);
+                    println("meet monster");
+                    println(this.randPos[i].x);
+                    println(this.randPos[i].y);
+                    break;
             }
         };
     }
