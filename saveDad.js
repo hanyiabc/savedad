@@ -51,8 +51,8 @@ var sketchProc = function (processingInstance) {
         BulletObj.prototype.draw = function() {
             bullet.select();
             // set bullet position
-            if (this.pos === 1){this.x = 350;this.y = 170;}
-            if (this.pos === 2){this.x = 350;this.y = 270;}
+            if (this.pos === 1){this.x = 350;this.y = 320;}
+            if (this.pos === 2){this.x = 350;this.y = 420;}
             MyPandaBullet.draw();
             MyPandaBullet.x = this.x; MyPandaBullet.y =  this.y;
         };
@@ -80,47 +80,50 @@ var sketchProc = function (processingInstance) {
         var grassObj = function(x,y){this.x = x;this.y = y;this.size = 40}
         grassObj.prototype.draw = function(){image(grass, this.x- this.size/2, this.y- this.size/2, this.size, this.size);}
         var gameObj = function(){
+            //64
             this.tilemap = [ 
-            "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", //64
-            "w                  ggggggggggg                      			w",
-            "w                                                              w",
-            "w                                                              w",
-            "wwwwwww                                                w     w w",
-            "wwwwwww                      wwwwwwwww     w                   w",
-            "wwwwwww          											    w",
-            "w                 											    w",
-            "w         wwwwwwww											   gw",
-            "w         wwwwwwww											    w",
-            "w         wwwwwwww											    w",
-            "w      gg          											w",
-            "w             gg   											w",
-            "w         gg       											w",
-            "w           gg     											w",
-            "w                 											    w",
-            "w                 											    w",
-            "w               ww											    w",
-            "w   w         wwww											   ww",
-            "w     w         ww											  www",
-            "w																w",
-            "w       w         											    w",
-            "wwwwwwwwwww       											    w",
-            "w       w         											    w",
-            "w     w           											    w",
-            "w    w            											    w",
-            "w       w         											    w",
-            "wwwwwwwwww        											    w",
-            "w       w         											    w",
-            "w     w           											    w",
-            "w                 											    w",
-            "w                 											    w",
-            "w                 											    w",
-            "w    w            											    w",
-            "w    w            											    w",
-            "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
+                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", 
+                "w                wwwwwwww           wwwwwww                    w",
+                "w                wwwwwwww           wwwwwww                    w",
+                "w                wwwwwwww           wwwwwww            wwwwwwwww",
+                "wwwwwww          wwwwwwww           wwwwwww            wwwwwwwww",
+                "wwwwwww          wwwwwwww           wwwwwww            wwwwwwwww",
+                "wwwwwwwggggggggggwwwwwwww           ggggggg                    w",
+                "wggggggggggggggggwwwwwwww           ggggggg                    w",
+                "w                wwwwwwww           ggggggg                    w",
+                "w                wwwwwwww           ggggggg                    w",
+                "w                wwwwwwww           wwwwwww                    w",
+                "w                                   wwwwwww                    w",
+                "wwwwwwww                            wwwwwww                    w",
+                "wwwwwwwwggggggggg                   wwwwwww                    w",
+                "wwwwwwwwggggggggg                   wwwwwww                    w",
+                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww                w",
+                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww                w",
+                "w            wwwwwww                    wwwwwwwggggggggggwwwwwww",
+                "w            wwwwwww                    wwwwwwwggggggggggwwwwwww",
+                "w            wwwwwww                    wwwwwww          wwwwwww",
+                "w                                       wwwwwww                w",
+                "w                                       wwwwwww                w",
+                "wwwwwwww                                                       w",
+                "wwwwwwww                                                       w",
+                "wwwwwwww                 wwwwwwww                              w",
+                "w                        wwwwwwww                              w",
+                "w                        wwwwwwww                              w",
+                "w                 wwwwwwwwwwwwwww                              w",
+                "w                 wwwwwwwwwwwwwww                              w",
+                "w                 wwwwwwwwwwwwwww                              w",
+                "w                        wwwwwwww                              w",
+                "w                        wwwwwwww                              w",
+                "w                        wwwwwwwwwwwwwwww                      w",
+                "wwwwww                   wwwwwwwwwwwwwwww                      w",
+                "wwwwww                   wwwwwwwwwwwwwwww                      w",
+                "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
+    
             this.xCor = 0;
             this.yCor = 0;
             this.initMap = 0;
-            this.walls = []; this.grasses = [];
+            this.walls = []; 
+            this.grasses = [];
 
         }
         var game = new gameObj();
@@ -150,6 +153,58 @@ var sketchProc = function (processingInstance) {
         textImgs.push(loadImage("assets/save_dad.png"));
         textImgs.push(loadImage("assets/Instruction.png"));
         textImgs.push(loadImage("assets/Start_Adv.png"));
+
+        var bigCastle = [];
+        bigCastle.push(loadImage("assets/bigcastle_blue.png"));
+        bigCastle.push(loadImage("assets/bigcastle_green.png"));
+        bigCastle.push(loadImage("assets/bigcastle_orange.png"));
+        bigCastle.push(loadImage("assets/bigcastle_purple.png"));
+        bigCastle.push(loadImage("assets/bigcastle_red.png"));
+        bigCastle.push(loadImage("assets/bigcastle_yellow.png"));
+
+        var smallCastle = [];
+        smallCastle.push(loadImage("assets/smallcastle_red_blue.png"));
+        smallCastle.push(loadImage("assets/smallcastle_red_green.png"));
+        smallCastle.push(loadImage("assets/smallcastle_red_orange.png"));
+        smallCastle.push(loadImage("assets/smallcastle_red_yellow.png"));
+
+        var bigCObj = function(x,y){
+            this.x = x;
+            this.y = y;
+            this.step = 0;
+            this.currFrame = frameCount;
+        }
+        bigCObj.prototype.draw = function(){
+            if(this.step<6){
+                image(bigCastle[this.step], this.x, this.y, 1300, 800);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.step++;
+                }
+            }
+            else{
+                this.step = 0;
+            }
+        }
+
+        var smallCObj = function(x,y){
+            this.x = x;
+            this.y = y;
+            this.step = 0;
+            this.currFrame = frameCount;
+        }
+        smallCObj.prototype.draw = function(){
+            if(this.step<4){
+                image(smallCastle[this.step], this.x, this.y, 600, 550);
+                if(frameCount-this.currFrame>30){
+                    this.currFrame = frameCount;
+                    this.step++;
+                }
+            }
+            else{
+                this.step = 0;
+            }
+        }
 
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
@@ -505,7 +560,7 @@ var sketchProc = function (processingInstance) {
                     }
                 }
             }
-        }
+        };
 
         gameObj.prototype.initTilemap = function() {
             for (var i = 0; i< this.tilemap.length; i++) {
@@ -523,16 +578,24 @@ var sketchProc = function (processingInstance) {
         };
         
         gameObj.prototype.move = function(){
-
             //if(mainChara.position.x+this.xCor <= 20 &&keyArray[LEFT] === 1){println(mainChara.position.x);println(this.xCor);this.xCor+=2;}
             //if(mainChara.position.x+this.xCor >= 1240 &&keyArray[RIGHT] === 1){this.xCor-=2;}
             //if(mainChara.position.y+this.yCor <= 40 &&keyArray[UP] === 1){this.yCor+=2;}
             //if(mainChara.position.y+this.yCor >= 660 &&keyArray[DOWN] === 1){this.yCor-=2;}
         };
 
-        var MyPanda = new PandaObj(200, 300);
-        var croc = new Croc(600,400);
-        var spider = new SpiderObj(800, 400);
+        var star = function(x, y, d) {
+            noStroke();
+            fill(250, 245, 250);
+            ellipse(x, y, d, d);
+        };
+        
+
+        var bigC1 = new bigCObj(50, -50);
+        var smallC1 = new smallCObj(-100,200);
+        var smallC2 = new smallCObj(800,200);
+        var croc1 = new Croc(1000,100); 
+        var mainChara1 = new MainChar(100,100,150);
         var bullet = new BulletObj(75,150);
         var draw = function () {
             switch (state)
@@ -541,10 +604,18 @@ var sketchProc = function (processingInstance) {
                     var f = createFont("monospace");
                     // Title
                     textFont(f);
-                    background(166, 103, 166);
+                    background(28, 31, 29);
+                    for (var i = 0; i < 500; i++) {
+                        star(random(width), random(height), random(1, 2));
+                    }
+                    bigC1.draw();
+                    smallC1.draw();
+                    smallC2.draw();
+                    mainChara1.disp();
+                    croc1.draw();
                     textSize(42);
                     fill(232, 211, 23);
-                    image(textImgs[0],380, -180, 500, 500);
+                    image(textImgs[0],400, -90, 420, 350);
                     
                     //bullet point
                     stroke(228, 237, 59);
@@ -553,18 +624,19 @@ var sketchProc = function (processingInstance) {
                     
                     // Options
                     textSize(30);
-                    fill(40, 48, 44);
-                    image(textImgs[1], 340, -60, 600, 600);
-                    image(textImgs[2], 385, 40, 600, 600);    
+                    fill(30, 189, 94);
+                    image(textImgs[1], 300, 100, 600, 600);
+                    image(textImgs[2], 345, 200, 600, 600);    
 
                     // Author
                     textSize(20);
-                    text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 500, 650);
+                    text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 540, 680);
                     break;
                 case 1:  // instruction
                     var f = createFont("monospace");
                     textFont(f);
                     background(51, 33, 51);
+                   
                     textSize(42);
                     fill(232, 211, 23);
                     text("  _Instruction_ \n", 440, 70);
