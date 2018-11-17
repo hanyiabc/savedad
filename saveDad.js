@@ -591,11 +591,18 @@ var sketchProc = function (processingInstance) {
         };
         
 
+<<<<<<< HEAD
         var bigC1 = new bigCObj(50, -50);
         var smallC1 = new smallCObj(-100,200);
         var smallC2 = new smallCObj(800,200);
         var croc1 = new Croc(1000,100); 
         var mainChara1 = new MainChar(100,100,150);
+=======
+        var MyPanda = new PandaObj(100, 100);
+        var mainChara = new MainChar(100,500);
+        var croc = new Croc(1000,500);
+        var spider = new SpiderObj(1000, 100);
+>>>>>>> 0d54c875bfa3e88f1740608b38e58bd7dac234ff
         var bullet = new BulletObj(75,150);
         var draw = function () {
             switch (state)
@@ -636,7 +643,18 @@ var sketchProc = function (processingInstance) {
                     var f = createFont("monospace");
                     textFont(f);
                     background(51, 33, 51);
+<<<<<<< HEAD
                    
+=======
+					
+					fill(51, 33, 51);
+					rect(0, 0, 1280, 720);
+                    MyPanda.draw();
+                    mainChara.draw();
+                    croc.draw();
+                    spider.draw();
+					
+>>>>>>> 0d54c875bfa3e88f1740608b38e58bd7dac234ff
                     textSize(42);
                     fill(232, 211, 23);
                     text("  _Instruction_ \n", 440, 70);
@@ -648,6 +666,8 @@ var sketchProc = function (processingInstance) {
                     text("             They defeat monsters around the kingdom.              ", 300,420);
                     text("             With the great courage and wisdom.               ",300, 450);
                     text("             the Boss was slayed and Dad was saved.", 300, 480);
+					
+
                     if(keyArray[ENTER]===1){
                         //println(2);
                         state = 0;
@@ -655,6 +675,7 @@ var sketchProc = function (processingInstance) {
                     }
                     break;
                 case 2:  // start game
+<<<<<<< HEAD
                     background(0, 33, 51);
                     pushMatrix();
                     translate(game.xCor,game.yCor);
@@ -669,6 +690,13 @@ var sketchProc = function (processingInstance) {
                     game.move();
                     mainChara.draw();
                     mainChara.move();
+=======
+                    background(51, 33, 51);
+                    fill(51, 33, 51);
+                    rect(0, 0, 1280, 720);
+
+
+>>>>>>> 0d54c875bfa3e88f1740608b38e58bd7dac234ff
                     if (keyArray[ENTER] === 1) {
                         state = 0;
                         keyArray[ENTER] = 0;
