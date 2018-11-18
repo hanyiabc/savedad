@@ -1,18 +1,17 @@
 // Name: Guan Congyi, Han Yi, Pan Jiacong
 var sketchProc = function (processingInstance) {
     with (processingInstance) {
-        size(1280, 720);
-        frameRate(60);
-        angleMode = "radiant";
 
+        size(1280, 720);
+        angleMode = "radiant";
+        frameRate(60);
         /*   State: 0 - Home Screen
                     1 - Instruction
                     2 - Play
         */
 
-        var state = 5;
+        var state = 0;
         var keyArray = [];
-        var releaseArray = [];
         var backgroundImgs = [];
         var enemies = [];
         var particles = [];
@@ -25,19 +24,17 @@ var sketchProc = function (processingInstance) {
         var initialized=0;
         var wall; var grass; var brick;
 
-        var keyPressed = function () { keyArray[keyCode] = 1; };
-        var keyReleased = function () { keyArray[keyCode] = 0; releaseArray[keyCode] = 1; };
+        var keyPressed = function () { keyArray[keyCode] = 1;};
+        
+        var keyReleased = function () { keyArray[keyCode] = 0;};
         var BagObj = function () {
-            this.numofPotion = 3;
-            this.numofRevive = 1;
+            this.numofPotion = 7;
+            this.numofRevive = 2;
         };
 
         var initialize = function()
         {
-            if(!initialize)
-            {
-                initialize=1;
-                // Panda 
+
                 pandas.push(loadImage("assets/panda.png"));
                 pandas.push(loadImage("assets/panda_shy.png"));
                 pandas.push(loadImage("assets/panda_dead.png"));
@@ -87,12 +84,8 @@ var sketchProc = function (processingInstance) {
                 wall= loadImage("assets/block_brown_main.png");
                 grass = loadImage("assets/grassblock1.png");
                 brick = loadImage("assets/wall_castle.png");
-            }
-            if (mouseClicked) {
-                state = 0;
-            }
         };
-
+        initialize();
         
         var particleObj = function (x, y) {
             this.position = new PVector(x, y);
@@ -129,7 +122,7 @@ var sketchProc = function (processingInstance) {
         }
         PandaObj.prototype.draw = function () {
             if (this.step < 3) {
-                image(pandas[this.step], this.x, this.y, 100, 60);
+                image(pandas[this.step], this.x - 75, this.y - 45, 150, 90);
                 if (frameCount - this.currFrame > 30) {
                     this.currFrame = frameCount;
                     this.step++;
@@ -150,9 +143,13 @@ var sketchProc = function (processingInstance) {
         BulletObj.prototype.draw = function () {
             bullet.select();
             // set bullet position
-            if (this.pos === 1) { this.x = 400; this.y = 500; }
-            if (this.pos === 2) { this.x = 400; this.y = 540; }
+            if (this.pos === 1) { this.x = 470; this.y = 530; }
+            if (this.pos === 2) { this.x = 470; this.y = 585; }
             MyPandaBullet.draw();
+            fill(255,0,0);
+            stroke(0,0,0);
+            strokeWeight(2);
+            ellipse(this.x-40, this.y, 20,20);
             MyPandaBullet.x = this.x; MyPandaBullet.y = this.y;
         };
         BulletObj.prototype.select = function () {
@@ -208,14 +205,14 @@ var sketchProc = function (processingInstance) {
                 "wwwwwwww                 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
                 "w                        wwbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbw",
                 "w                        wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
-                "w                 wwwwwwwwwwwwwww                              w",
-                "w                 wwwbbbbbbbbbwww                              w",
-                "w                 wwwwwwwwwbbbwww                              w",
-                "w                        wwwbbwww                              w",
-                "w                        wwwwwwww                              w",
-                "w                        gggggggg                              w",
-                "wwwwww                   gggggggg                              w",
-                "wwwwww                   gggggggg                              w",
+                "w                 wwwwwwwwwwwwwww                    g          ",
+                "w                 wwwbbbbbbbbbwww                     g         ",
+                "w                 wwwwwwwwwbbbwww                      g        ",
+                "w                        wwwbbwww   ggggggggggggggggggggg       ",
+                "w                        wwwwwwww                      g        ",
+                "w                        gggggggg                     g         ",
+                "wwwwww                   gggggggg                    g          ",
+                "wwwwww                   gggggggg                               ",
                 "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",];
 
             this.xCor = 0;
@@ -228,11 +225,6 @@ var sketchProc = function (processingInstance) {
 
         };
         var game = new gameObj();
-
-        
-
-
-        
 
         var bigCObj = function (x, y) {
             this.x = x;
@@ -272,19 +264,20 @@ var sketchProc = function (processingInstance) {
         };
         var SpiderObj = function (x, y) {
             this.position = new PVector(x, y);
-            this.size = 300;
+            this.size = 200;
             this.state = 0;
             this.spider = [];
             this.currFrame = frameCount;
             //this.spider.push(loadImage("assets/spider1.png"))
-            this.spider.push(loadImage("assets/spider2.png"))
+            this.spider.push(loadImage("assets/spider2.png"));
             this.spider.push(loadImage("assets/spider3.png"));
-            this.spider.push(loadImage("assets/spider2.png"))
-            this.HP = 500;
-            this.currHP = 500;
-            this.ATK = 70;
+            this.spider.push(loadImage("assets/spider2.png"));
+            this.HP = 300;
+            this.currHP = this.HP;
+            this.ATK = 80;
             this.pixMoved = 0;
         };
+
         SpiderObj.prototype.draw = function () {
             switch (this.state) {
                 case 0:
@@ -354,6 +347,7 @@ var sketchProc = function (processingInstance) {
             this.HP = 1000;
             this.currHP = this.HP;
             this.ATK = 40;
+            this.distMoved = 0;
         };
 
         //functions for checking wall
@@ -370,7 +364,7 @@ var sketchProc = function (processingInstance) {
                             (mainChara.position.x + mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2)
                         )
                     ) &&
-                    (mainChara.position.y - 2 - mainChara.size / 2) >= (game.walls[i].y + game.walls[i].size / 2 - 3) &&
+                    (mainChara.position.y - 2 - mainChara.size / 2) >= (game.walls[i].y + game.walls[i].size / 2 - 2) &&
                     (mainChara.position.y - 2 - mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
                 ) {
                     return true;
@@ -392,7 +386,7 @@ var sketchProc = function (processingInstance) {
                             (mainChara.position.y + mainChara.size / 2) <= (game.walls[i].y + game.walls[i].size / 2)
                         )
                     ) &&
-                    (mainChara.position.x + 2 + mainChara.size / 2) <= (game.walls[i].x - game.walls[i].size / 2 + 3) &&
+                    (mainChara.position.x + 2 + mainChara.size / 2) <= (game.walls[i].x - game.walls[i].size / 2 + 2) &&
                     (mainChara.position.x + 2 + mainChara.size / 2) >= (game.walls[i].x - game.walls[i].size / 2)
                 ) {
                     return true;
@@ -415,7 +409,7 @@ var sketchProc = function (processingInstance) {
                         )
                     ) &&
                     (mainChara.position.x - 2 - mainChara.size / 2) <= (game.walls[i].x + game.walls[i].size / 2) &&
-                    (mainChara.position.x - 2 - mainChara.size / 2) >= (game.walls[i].x + game.walls[i].size / 2 - 3)
+                    (mainChara.position.x - 2 - mainChara.size / 2) >= (game.walls[i].x + game.walls[i].size / 2 - 2)
                 ) {
                     return true;
                 }
@@ -436,7 +430,7 @@ var sketchProc = function (processingInstance) {
                         )
                     ) &&
                     (mainChara.position.y + 2 + mainChara.size / 2) >= (game.walls[i].y - game.walls[i].size / 2) &&
-                    (mainChara.position.y + 2 + mainChara.size / 2) <= (game.walls[i].y - game.walls[i].size / 2 + 3)
+                    (mainChara.position.y + 2 + mainChara.size / 2) <= (game.walls[i].y - game.walls[i].size / 2 + 2)
                 ) {
                     return true;
                 }
@@ -541,7 +535,7 @@ var sketchProc = function (processingInstance) {
         };
 
 
-        var bag = new BagObj
+        var bag = new BagObj();
         var GameBackground = function () {
             this.currY = 0;
             this.menuRotate = 0;
@@ -551,7 +545,6 @@ var sketchProc = function (processingInstance) {
             this.Increment = 0.08;
             this.selection = BattleMenuSelection.ATK;
             this.enemyIdx = 0;
-            enemies.push(new SpiderObj(200, 350));
             this.bagSelection = 0;
             this.pixMoved = 0;
         };
@@ -567,10 +560,10 @@ var sketchProc = function (processingInstance) {
             text(mainCharBattle.currHP, 1110, 620);
             text(mainCharBattle.HP, 1187, 672);
             textSize(70);
-            text("/", 1183, 657);
+            text("/", 1175, 657);
 
             pushMatrix();
-            translate(1015, 150);
+            translate(1015, 163);
             rotate(this.menuRotate);
             image(backgroundImgs[3], -125, -125, 250, 250);
             popMatrix();
@@ -580,12 +573,13 @@ var sketchProc = function (processingInstance) {
                 if (enemies[i].currHP > 0) {
                     enemies[i].draw();
                     pushMatrix();
-                    translate(enemies[i].position.x, enemies[i].position.y + enemies[i].size);
+                    translate(enemies[i].position.x, enemies[i].position.y + enemies[i].size*0.8);
                     noFill();
                     strokeWeight(3);
-                    rect(0, 0, 150, 10);
+                    stroke(0,0,0);
+                    rect(0, 0, enemies[i].size, 10);
                     fill(0, 255, 0);
-                    var temp = 150 * (enemies[i].currHP / enemies[i].HP);
+                    var temp = enemies[i].size * (enemies[i].currHP / enemies[i].HP);
                     if (temp < 0) {
                         temp = 0;
                     }
@@ -610,14 +604,40 @@ var sketchProc = function (processingInstance) {
                 }
             }
 
+            if(this.state==BattleMenuStates.IDLE)
+            {
+                var textposX = 310;
+                var textposY = 23;
+                rect(300, 0, 800, 30);
+                textSize(24);
+                fill(0, 0, 0);
+                switch (this.selection) {
+                    case BattleMenuSelection.ATK:
+                        text("Attak the enemy: damage depends on the character's strength", textposX, textposY);
+                        break;
+                    case BattleMenuSelection.ITEM:
+                        text("Use Item: using an item will finish your round", textposX, textposY);
+                        break;
+                    case BattleMenuSelection.FLEE:
+                        text("You are not allowed to flee in this stage of the game", textposX, textposY);
+                        break;
+                    case BattleMenuSelection.ULR:
+                        text("Ultimate Skill: you have not unlocked your ultimate yet", textposX, textposY);
+                        break;
+                }
+            }
+
+
+
         };
+        
 
         //left/right selection
         GameBackground.prototype.move = function () {
             switch (this.state) {
                 case BattleMenuStates.IDLE:
-                    if (releaseArray[LEFT]) {
-                        releaseArray[LEFT] = 0;
+                    if (keyArray[LEFT]) {
+                        keyArray[LEFT] = 0;
                         this.state = BattleMenuStates.TURNINGL;
                         this.degreeTurned = 0;
                         this.prevAngle = this.menuRotate;
@@ -628,8 +648,8 @@ var sketchProc = function (processingInstance) {
                             this.selection--;
                         }
                     }
-                    else if (releaseArray[RIGHT]) {
-                        releaseArray[RIGHT] = 0;
+                    else if (keyArray[RIGHT]) {
+                        keyArray[RIGHT] = 0;
                         this.state = BattleMenuStates.TURNINGR;
                         this.degreeTurned = 0;
                         this.prevAngle = this.menuRotate;
@@ -641,8 +661,8 @@ var sketchProc = function (processingInstance) {
                         }
                     }
 
-                    else if (releaseArray[ENTER]) {
-                        releaseArray[ENTER] = 0;
+                    else if (keyArray[ENTER]) {
+                        keyArray[ENTER] = 0;
                         switch (this.selection) {
                             case BattleMenuSelection.ATK:
                                 this.state = BattleMenuStates.ATKING;
@@ -653,7 +673,7 @@ var sketchProc = function (processingInstance) {
                             case BattleMenuSelection.FLEE:
                                 break;
                             case BattleMenuSelection.ULR:
-                                this.state = BattleMenuStates.ENEMYATK;
+                                //this.state = BattleMenuStates.ENEMYATK;
                                 break;
                         }
 
@@ -679,8 +699,8 @@ var sketchProc = function (processingInstance) {
                     break;
                 case BattleMenuStates.INBAG:
 
-                    if (releaseArray[UP]) {
-                        releaseArray[UP] = 0;
+                    if (keyArray[UP]) {
+                        keyArray[UP] = 0;
                         if (this.bagSelection == 0) {
                             this.bagSelection = 2;
                         }
@@ -688,8 +708,8 @@ var sketchProc = function (processingInstance) {
                             this.bagSelection--;
                         }
                     }
-                    else if (releaseArray[DOWN]) {
-                        releaseArray[DOWN] = 0;
+                    else if (keyArray[DOWN]) {
+                        keyArray[DOWN] = 0;
                         if (this.bagSelection == 2) {
                             this.bagSelection = 0;
                         }
@@ -716,7 +736,7 @@ var sketchProc = function (processingInstance) {
                             text("Potion: Recover 500 HP", 380, 200);
                             break;
                         case 1:
-                            text("Life Potion: Revive and Recover 100 HP", 380, 200);
+                            text("Life Potion: Revive and Recover 150 HP", 380, 200);
                             break;
                         case 2:
                             text("Go Back", 380, 200);
@@ -725,8 +745,8 @@ var sketchProc = function (processingInstance) {
                             break;
                     }
 
-                    if (releaseArray[ENTER]) {
-                        releaseArray[ENTER] = 0;
+                    if (keyArray[ENTER]) {
+                        keyArray[ENTER] = 0;
                         switch (this.bagSelection) {
                             case 0:
                                 if (bag.numofPotion > 0) {
@@ -742,7 +762,7 @@ var sketchProc = function (processingInstance) {
                             case 1:
                                 if (bag.numofRevive > 0) {
                                     bag.numofRevive--;
-                                    mainCharBattle.currHP += 500;
+                                    mainCharBattle.currHP += 150;
                                     if (mainCharBattle.currHP >= mainCharBattle.HP) {
                                         mainCharBattle.currHP = mainCharBattle.HP;
                                     }
@@ -768,12 +788,57 @@ var sketchProc = function (processingInstance) {
                     this.state = BattleMenuStates.IDLE;
                     break;
                 case BattleMenuStates.WON:
-                    fill(255, 0, 0);
-                    text("You Won!", 400, 400)
+                    fill(0, 255, 0);
+                    stroke(0, 0, 0);
+                    rect(300, 300, 600, 250);
+                    fill(0, 0, 0);
+                    textSize(50);
+                    text("You Won!\nPress Enter", 350, 400)
+                    if(keyArray[ENTER])
+                    {
+                        keyArray[ENTER]=0
+                        this.state = BattleMenuStates.IDLE;
+                        state = 2;
+                    }
                     break;
                 case BattleMenuStates.LOST:
-                    fill(255, 0, 0);
-                    text("You Lose!", 400, 400)
+                    if(bag.numofRevive!=0)
+                    {
+                        fill(0,255,0);
+                        stroke(0,0,0);
+                        rect(300,300,600,250);
+                        fill(0,0,0);
+                        textSize(50);
+                        text("Life Potion Used\nPress Enter", 350, 400)
+
+                        if (keyArray[ENTER]) {
+                            keyArray[ENTER] = 0
+                            bag.numofRevive--;
+                            mainCharBattle.currHP=150;
+                            this.state= BattleMenuStates.IDLE;
+                        }
+                    }
+                    else
+                    {
+                        fill(0, 255, 0);
+                        stroke(0, 0, 0);
+                        rect(300, 300, 600, 250);
+                        fill(0, 0, 0);
+                        textSize(50);
+                        text("You Lose!\nPress Enter to try again", 350, 400);
+                        if (keyArray[ENTER]) {
+                            keyArray[ENTER] = 0
+                            state = 0;
+                            mainChara = new MainChar(350, 200, 100);
+                            mainChara1 = new MainChar(250, 500, 150);
+                            mainCharBattle = new MainChar(880, 300);
+                            game = new gameObj();
+                            battleBack = new GameBackground();
+                            mainCharBattle.size = 250;
+                            enemies = [];
+                            bag = new BagObj();
+                        }
+                    }
                     break;
                 case BattleMenuStates.ATKING:
 
@@ -796,7 +861,7 @@ var sketchProc = function (processingInstance) {
                     }
                     if (this.pixMoved == 16) {
                         for (var i = 0; i < 100; i++) {
-                            particles.push(new particleObj(enemies[this.enemyIdx].position.x, enemies[this.enemyIdx].position.y));
+                            particles.push(new particleObj(enemies[this.enemyIdx].position.x + enemies[this.enemyIdx].size / 2, enemies[this.enemyIdx].position.y + enemies[this.enemyIdx].size / 2));
                         }
                     }
                     break;
@@ -813,25 +878,29 @@ var sketchProc = function (processingInstance) {
                     }
                     break;
                 case BattleMenuStates.ENEATKING:
-                    if (enemies[this.enemyIdx].pixMoved >= 16) {
-                        mainCharBattle.position.x += 2;
-                        enemies[this.enemyIdx].pixMoved += 2;
-                        enemies[this.enemyIdx].position.x -= 2;
-                        if (enemies[this.enemyIdx].pixMoved >= 32) {
-                            mainCharBattle.position.x -= 16;
-                            this.state = BattleMenuStates.ENEATKED;
-                            enemies[this.enemyIdx].pixMoved = 0;
+                    for(var i =0;i<enemies.length;i++)
+                    {
+                        if (enemies[i].pixMoved >= 16) {
+                            mainCharBattle.position.x += 2;
+                            enemies[i].pixMoved += 2;
+                            enemies[i].position.x -= 2;
+                            if (enemies[i].pixMoved >= 32) {
+                                mainCharBattle.position.x -= 16;
+                                this.state = BattleMenuStates.ENEATKED;
+                                enemies[i].pixMoved = 0;
+                            }
+                        }
+                        else if (enemies[i].pixMoved < 16) {
+                            enemies[i].position.x += 2;
+                            enemies[i].pixMoved += 2;
+                        }
+                        if (enemies[i].pixMoved == 16) {
+                            for (var i = 0; i < 100; i++) {
+                                particles.push(new particleObj(mainCharBattle.position.x + mainCharBattle.size / 3, mainCharBattle.position.y + mainCharBattle.size / 3));
+                            }
                         }
                     }
-                    else if (enemies[this.enemyIdx].pixMoved < 16) {
-                        enemies[this.enemyIdx].position.x += 2;
-                        enemies[this.enemyIdx].pixMoved += 2;
-                    }
-                    if (enemies[this.enemyIdx].pixMoved == 16) {
-                        for (var i = 0; i < 100; i++) {
-                            particles.push(new particleObj(mainCharBattle.position.x + mainCharBattle.size / 3, mainCharBattle.position.y + mainCharBattle.size / 3));
-                        }
-                    }
+                    
                     break;
                 case BattleMenuStates.ENEATKED:
                     for (var i = 0; i < enemies.length; i++) {
@@ -848,148 +917,209 @@ var sketchProc = function (processingInstance) {
                     break;
             }
         };
+
+        gameObj.prototype.initTilemap = function () {
+            for (var i = 0; i < this.tilemap.length; i++) {
+                for (var j = 0; j < this.tilemap[i].length; j++) {
+                    switch (this.tilemap[i][j]) {
+                        case 'w':
+                            this.walls.push(new wallObj(j * 40, i * 40));
+                            break;
+                        case 'g':
+                            this.grasses.push(new grassObj(j * 40, i * 40));
+                            break;
+                        case 'b':
+                            this.bricks.push(new brickObj(j * 40, i * 40));
+                            break;
+                    }
+                }
+            }
+            for (var i = 0; i < 5; i++) {
+                var r = round(random(0, this.grasses.length));
+                //println(r);
+                var pos = new PVector(this.grasses[r].x, this.grasses[r].y);
+                this.randPos.push(pos);
+            }
+
+        };
+
+        gameObj.prototype.metMonster = function () {
+            
+            var rand = random(1, 2);
+            if (Math.floor(rand) == 1) {
+                enemies.push(new SpiderObj(200, 350));
+            }
+            else if (Math.floor(rand) == 2) {
+                enemies.push(new SpiderObj(200, 350));
+                enemies.push(new SpiderObj(450, 200));
+            }
+            state = 4;
+
+        };
+        MainChar.prototype.move = function () {
+            // Change map threshhold here
+            var mapxMin = 100;
+            var mapxMax = 700;
+            var mapyMin = 200;
+            var mapyMax = 400;
+            if (keyArray[UP] === 1) {
+                this.MainStates = 5;
+                if (!checkWallUp()) {
+                    if (keyArray[SHIFT] === 1) {
+                        if (this.position.y + game.yCor <= mapxMin) {
+                            game.yCor += 3;
+                        }
+                        this.position.y -= 3;
+                        this.distMoved += 3;
+
+                    }
+                    else {
+                        if (this.position.y + game.yCor <= mapxMin) {
+                            game.yCor += 2;
+                        }
+                        this.position.y -= 2;
+                        this.distMoved += 2;
+
+                    }
+                }
+                else
+                {
+                    this.position.y ++;
+
+                }
+            }
+            else if (keyArray[DOWN] === 1) {
+                this.MainStates = 6;
+                if (!checkWallDown()) {
+                    if (keyArray[SHIFT] === 1) {
+                        if (this.position.y + game.yCor >= mapyMax) {
+                            game.yCor -= 3;
+                        }
+                        this.position.y += 3;
+                        this.distMoved += 3;
+
+                    }
+                    else {
+                        if (this.position.y + game.yCor >= mapyMax) {
+                            game.yCor -= 2;
+                        }
+                        this.position.y += 2;
+                        this.distMoved += 2;
+
+                    }
+                }
+                else
+                {
+                    this.position.y--;
+
+                }
+
+            }
+            else if (keyArray[RIGHT] === 1) {
+                this.MainStates = 4;
+                if (!checkWallRight()) {
+                    if (keyArray[SHIFT] === 1) {
+                        if (this.position.x + game.xCor >= mapxMax) {
+                            game.xCor -= 3;
+                        }
+                        this.position.x += 3;
+                        this.distMoved += 3;
+
+                    }
+                    else {
+                        if (this.position.x + game.xCor >= mapxMax) {
+                            game.xCor -= 2;
+                        }
+                        this.position.x += 2;
+                        this.distMoved += 2;
+
+                    }
+                }
+                else
+                {
+                    this.position.x--;
+
+                }
+            }
+            else if (keyArray[LEFT] === 1) {
+                this.MainStates = 3;
+                if (!checkWallLeft()) {
+                    if (keyArray[SHIFT] === 1) {
+                        if (this.position.x + game.xCor <= mapyMin) {
+                            game.xCor += 3;
+                        }
+                        this.position.x -= 3;
+                        this.distMoved += 3;
+
+                    }
+                    else {
+                        if (this.position.x + game.xCor <= mapyMin) {
+                            game.xCor += 2;
+                        }
+                        this.position.x -= 2;
+                        this.distMoved += 2;
+
+                    }
+                }
+                else
+                {
+                    this.distMoved++;
+
+                }
+            }
+            if(this.position.y > 1120 && this.position.x > 2300)
+            {  
+                state = 5;
+            }
+        };
+
         MainChar.prototype.draw = function () {
             switch (this.MainStates) {
+                case MainStates.UP:
+                    image(mainChar[0], this.position.x - this.size / 2, this.position.ythis.size / 2, this.size, this.size);
+                    
+                    break;
+                case MainStates.DOWN:
+                    image(mainChar[3], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
+                    
+                    break;
                 case MainStates.LEFT:
                     image(mainChar[6], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
+                    
                     break;
                 case MainStates.RIGHT:
                     image(mainChar[7], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
+                    
                     break;
                 case MainStates.UPW:
-                    if ((frameCount - this.currFrame) === 30) {
-                        this.step++;
+                    if (this.distMoved % 60 < 30) {
+                        this.step = 0;
+                    }
+                    else if (this.distMoved % 60 > 30) {
+                        this.step = 1;
                         this.currFrame = frameCount;
                     }
-                    if (this.step === 3) { this.step = 0 }
-                    image(mainChar[this.step], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
+                    image(mainChar[this.step + 1], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
                     break;
                 case MainStates.DOWNW:
-                    if ((frameCount - this.currFrame) === 30) {
-                        //println(1);
-                        // println(this.currFrame);
-                        // println(this.currFrame2);
-                        this.currFrame = frameCount;
-                        this.step++;
+                    if (this.distMoved % 60 < 30) {
+                        this.step = 0;
                     }
-                    if (this.step === 3) { this.step = 0 }
-                    image(mainChar[this.step + 3], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
+                    else if (this.distMoved % 60 > 30) {
+                        this.step = 1;
+                        this.currFrame = frameCount;
+                    }
+                    image(mainChar[this.step + 4], this.position.x - this.size / 2, this.position.y - this.size / 2, this.size, this.size);
                     break;
                 default:
                     break;
             }
-            MainChar.prototype.move = function () {
-                // Change map threshhold here
-                var mapxMin = 100;
-                var mapxMax = 700;
-                var mapyMin = 200;
-                var mapyMax = 400;
-                if (keyArray[UP] === 1) {
-                    this.MainStates = 5;
-                    if (!checkWallUp()) {
-                        if (keyArray[SHIFT] === 1) {
-                            if (this.position.y + game.yCor <= mapxMin) {
-                                game.yCor += 4;
-                            }
-                            this.position.y -= 4;
-                        }
-                        else {
-                            if (this.position.y + game.yCor <= mapxMin) {
-                                game.yCor += 2;
-                            }
-                            this.position.y -= 2;
-                        }
-                    }
-                }
-                else if (keyArray[DOWN] === 1) {
-                    this.MainStates = 6;
-                    if (!checkWallDown()) {
-                        if (keyArray[SHIFT] === 1) {
-                            if (this.position.y + game.yCor >= mapyMax) {
-                                game.yCor -= 4;
-                            }
-                            this.position.y += 4;
-                        }
-                        else {
-                            if (this.position.y + game.yCor >= mapyMax) {
-                                game.yCor -= 2;
-                            }
-                            this.position.y += 2;
-                        }
-                    }
+        };
 
-                }
-                else if (keyArray[RIGHT] === 1) {
-                    this.MainStates = 4;
-                    if (!checkWallRight()) {
-                        if (keyArray[SHIFT] === 1) {
-                            if (this.position.x + game.xCor >= mapxMax) {
-                                game.xCor -= 4;
-                            }
-                            this.position.x += 4;
-                        }
-                        else {
-                            if (this.position.x + game.xCor >= mapxMax) {
-                                game.xCor -= 2;
-                            }
-                            this.position.x += 2;
-                        }
-                    }
-                }
-                else if (keyArray[LEFT] === 1) {
-                    this.MainStates = 3;
-                    if (!checkWallLeft()) {
-                        if (keyArray[SHIFT] === 1) {
-                            if (this.position.x + game.xCor <= mapyMin) {
-                                game.xCor += 4;
-                            }
-                            this.position.x -= 4;
-                        }
-                        else {
-                            if (this.position.x + game.xCor <= mapyMin) {
-                                game.xCor += 2;
-                            }
-                            this.position.x -= 2;
-                        }
-                    }
-                }
-            };
 
-            gameObj.prototype.initTilemap = function () {
-                for (var i = 0; i < this.tilemap.length; i++) {
-                    for (var j = 0; j < this.tilemap[i].length; j++) {
-                        switch (this.tilemap[i][j]) {
-                            case 'w':
-                                this.walls.push(new wallObj(j * 40, i * 40));
-                                break;
-                            case 'g':
-                                this.grasses.push(new grassObj(j * 40, i * 40));
-                                break;
-                            case 'b':
-                                this.bricks.push(new brickObj(j * 40, i * 40));
-                                break;
-                        }
-                    }
-                }
-                for (var i = 0; i < 5; i++) {
-                    var r = round(random(0, this.grasses.length));
-                    //println(r);
-                    var pos = new PVector(this.grasses[r].x, this.grasses[r].y);
-                    this.randPos.push(pos);
-                    println(pos);
-                }
 
-            };
 
-            gameObj.prototype.metMonster = function () {
-                var distThreshhold = 50;
-                for (var i = 0; i < this.randPos.length; i++) {
-                    if (dist(this.randPos[i].x, this.randPos[i].y, mainChara.position.x, mainChara.position.y) < distThreshhold) {
-                        state = 4;
 
-                    }
-                }
-            };
 
             var star = function (x, y, d) {
                 noStroke();
@@ -997,15 +1127,14 @@ var sketchProc = function (processingInstance) {
                 ellipse(x, y, d, d);
             };
 
-
             var bigC1 = new bigCObj(-50, -50);
             var smallC1 = new smallCObj(-150, 170);
             var smallC2 = new smallCObj(760, 170);
             var croc1 = new Croc(1050, 0);
             var mainChara1 = new MainChar(250, 500, 150);
             var bullet = new BulletObj(75, 150);
-            processingInstance.draw = function () 
-            {
+            var battleBack = new GameBackground();
+            var draw = function () {
                 switch (state) {
                     case 0: // main screen
                         var f = createFont("monospace");
@@ -1032,12 +1161,13 @@ var sketchProc = function (processingInstance) {
                         // Options
                         textSize(30);
                         fill(30, 189, 94);
-                        image(textImgs[1], 450, 380, 300, 300);
-                        image(textImgs[2], 450, 420, 300, 300);
+                        image(textImgs[1], 450-75, 380-75, 450, 450);
+                        image(textImgs[2], 450 - 75, 420 - 50, 450, 450);
 
                         // Author
                         textSize(20);
-                        text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all right reserve", 540, 680);
+                        text("UP/DOWN To navigate; Enter to select",10,690)
+                        text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all rights reserve", 550, 690);
                         break;
                     case 1:  // instruction
                         var f = createFont("monospace");
@@ -1048,13 +1178,8 @@ var sketchProc = function (processingInstance) {
                         fill(232, 211, 23);
                         text("  _Instruction_ \n", 440, 70);
                         textSize(25);
-                        text("Instruction:  In the Map: UDLR, Shift Accel, E bag,\n              Arrow Key to move direction.\n", 300, 180);
-                        text("\n              During Battle:  Main character and main\n              pet Panda fight with monsters and Boss.\n", 300, 240);
-                        text("\n\nStory Line:  Iris's father was caught by demon.\n              ", 300, 300);
-                        text("\n             Iris starts the journey with pet Panda.               ", 300, 360);
-                        text("             They defeat monsters around the kingdom.              ", 300, 420);
-                        text("             With the great courage and wisdom.               ", 300, 450);
-                        text("             the Boss was slayed and Dad was saved.", 300, 480);
+                        text("Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spider\nFight the spiders and exit the gaden to win\nIn the Map: UDLR to move, Shift to Accel\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee for now\nYou have 7 potions in the bag\nLife potion can revive you\n", 300, 180);
+                        
                         if (keyArray[ENTER] === 1) {
                             //println(2);
                             state = 0;
@@ -1078,7 +1203,13 @@ var sketchProc = function (processingInstance) {
                         }
                         mainChara.draw();
                         mainChara.move();
-                        game.metMonster();
+                        var randnum  =random(300,800);
+                        if(mainChara.distMoved > randnum+700)
+                        {
+                            mainChara.distMoved = 0;
+                            game.metMonster();
+
+                        }
 
                         if (keyArray[ENTER] === 1) {
                             state = 0;
@@ -1088,27 +1219,38 @@ var sketchProc = function (processingInstance) {
                         break;
 
                     case 3: // 
-                        image(backgroundImgs[5], 0, 0);
 
                         break;
                     case 4:
-                        background(255, 255, 255);
+                        fill(255,255,255);
                         rect(0, 0, 1280, 720);
                         battleBack.draw();
                         battleBack.move();
-                        println(this.randPos[i].x);
-                        println(this.randPos[i].y);
                         break;
                     case 5:
-                        text("Press Enter To begin", 300,300);
-                        initialize();
-                        break;
+                        fill(125, 125, 0);
+                        rect(0, 0, 1280, 720);
+                        fill(0,255,255);
+                        textSize(30);
+                        text("Thanks for playing!!\nYou Won!! Full Game Experiene Cooming Soon!!\nEnter to Play Again", 200,400);
+                        if (keyArray[ENTER]) {
+                            keyArray[ENTER] = 0
+                            state = 0;
+                            mainChara = new MainChar(350, 200, 100);
+                            mainChara1 = new MainChar(250, 500, 150);
+                            mainCharBattle = new MainChar(880, 300);
+                            game = new gameObj();
+                            battleBack = new GameBackground();
+                            mainCharBattle.size = 250;
+                            enemies = [];
+                            bag = new BagObj();
+                        }
                     default:
                         break;
                 }
             };
-        }
     }
+    
 };
-var canvas = document.getElementById("mycanvas");
-var processingInstance = new Processing(canvas, sketchProc); 
+// var canvas = document.getElementById("mycanvas");
+// var processingInstance = new Processing(canvas, sketchProc); 
