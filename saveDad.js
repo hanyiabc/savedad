@@ -89,12 +89,11 @@ var sketchProc = function (processingInstance) {
         
         var particleObj = function (x, y) {
             this.position = new PVector(x, y);
-            //this.velocity = new PVector(random(-0.5, 0.5), random(-0.5, 0.5));	// cartesian
-            this.velocity = new PVector(random(0, TWO_PI), random(-0.5, 0.5));
+            this.velocity = new PVector(random(0, TWO_PI), random(-1.5, 1.5));
             this.size = random(1, 30);
             this.c1 = random(155, 255);
             this.c2 = random(0, 255);
-            this.timeLeft = 50;
+            this.timeLeft = 30;
         };
         particleObj.prototype.move = function () {
             var v = new PVector(this.velocity.y * cos(this.velocity.x),
@@ -608,6 +607,9 @@ var sketchProc = function (processingInstance) {
             {
                 var textposX = 310;
                 var textposY = 23;
+                fill(0,255,0);
+                strokeWeight(3);
+                stroke(0,0,0);
                 rect(300, 0, 800, 30);
                 textSize(24);
                 fill(0, 0, 0);
@@ -725,7 +727,7 @@ var sketchProc = function (processingInstance) {
 
                     textSize(24);
                     fill(0, 0, 0);
-                    text("Item                                                           Count", 380, 50);
+                    text("Item                            Count", 380, 50);
                     text("Potion:                                                        ", 380, 85);
                     text("Life Potion:                                                   ", 380, 115);
                     text(bag.numofPotion, 830, 85);
@@ -825,7 +827,7 @@ var sketchProc = function (processingInstance) {
                         rect(300, 300, 600, 250);
                         fill(0, 0, 0);
                         textSize(50);
-                        text("You Lose!\nPress Enter to try again", 350, 400);
+                        text("You Lose!\nPress Enter to try again", 350, 600);
                         if (keyArray[ENTER]) {
                             keyArray[ENTER] = 0
                             state = 0;
@@ -860,7 +862,7 @@ var sketchProc = function (processingInstance) {
                         this.pixMoved += 2;
                     }
                     if (this.pixMoved == 16) {
-                        for (var i = 0; i < 100; i++) {
+                        for (var i = 0; i < 200; i++) {
                             particles.push(new particleObj(enemies[this.enemyIdx].position.x + enemies[this.enemyIdx].size / 2, enemies[this.enemyIdx].position.y + enemies[this.enemyIdx].size / 2));
                         }
                     }
@@ -895,7 +897,7 @@ var sketchProc = function (processingInstance) {
                             enemies[i].pixMoved += 2;
                         }
                         if (enemies[i].pixMoved == 16) {
-                            for (var i = 0; i < 100; i++) {
+                            for (var i = 0; i < 200; i++) {
                                 particles.push(new particleObj(mainCharBattle.position.x + mainCharBattle.size / 3, mainCharBattle.position.y + mainCharBattle.size / 3));
                             }
                         }
@@ -903,11 +905,13 @@ var sketchProc = function (processingInstance) {
                     
                     break;
                 case BattleMenuStates.ENEATKED:
-                    for (var i = 0; i < enemies.length; i++) {
-                        mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
+                    if(particles.length==0)
+                    {
+                        for (var i = 0; i < enemies.length; i++) {
+                            mainCharBattle.currHP -= enemies[i].ATK + Math.floor((Math.random() * enemies[i].ATK) + 1);
+                        }
+                        this.state = BattleMenuStates.IDLE;
                     }
-
-                    this.state = BattleMenuStates.IDLE;
                     if (mainCharBattle.currHP <= 0) {
                         mainCharBattle.currHP = 0;
                         this.state = BattleMenuStates.LOST;
@@ -1178,7 +1182,7 @@ var sketchProc = function (processingInstance) {
                         fill(232, 211, 23);
                         text("  _Instruction_ \n", 440, 70);
                         textSize(25);
-                        text("Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spider\nFight the spiders and exit the gaden to win\nIn the Map: UDLR to move, Shift to Accel\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee for now\nYou have 7 potions in the bag\nLife potion can revive you\n", 300, 180);
+                        text("Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spiders\nFight the spiders and exit the garden to win\nIn the Map: Up/Down/Left/Right to move, Shift to Accelerate\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee from battle for now\nYou have 7 potions in the bag\nLife potion can revive you but can only recover 150 HP\n", 300, 180);
                         
                         if (keyArray[ENTER] === 1) {
                             //println(2);
