@@ -286,7 +286,7 @@ var sketchProc = function (processingInstance) {
                     image(this.spider[1], this.position.x, this.position.y, this.size, this.size);
                     break;
                 case 2:
-                    image(this.spider[0], this.position.x, this.position.y, this.size, this.size);
+                    image(this.spider[2], this.position.x, this.position.y, this.size, this.size);
                     break;
             }
             if (this.state < 3) {
