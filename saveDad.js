@@ -290,6 +290,7 @@ var sketchProc = function (processingInstance) {
                     break;
             }
             if (this.state < 3) {
+                //image(this.spider[this.state], this.x, this.y, 240, 160);
                 if (frameCount - this.currFrame > 30) {
                     this.currFrame = frameCount;
                     this.state++;
@@ -1119,134 +1120,139 @@ var sketchProc = function (processingInstance) {
             }
         };
 
-        var star = function (x, y, d) {
-            noStroke();
-            fill(250, 245, 250);
-            ellipse(x, y, d, d);
-        };
 
-        var bigC1 = new bigCObj(-50, -50);
-        var smallC1 = new smallCObj(-150, 170);
-        var smallC2 = new smallCObj(760, 170);
-        var croc1 = new Croc(1050, 0);
-        var mainChara1 = new MainChar(250, 500, 150);
-        var bullet = new BulletObj(75, 150);
-        var battleBack = new GameBackground();
-        var draw = function () {
-            switch (state) {
-                case 0: // main screen
-                    var f = createFont("monospace");
-                    // Title
-                    textFont(f);
-                    background(28, 31, 29);
-                    for (var i = 0; i < 500; i++) {
-                        star(random(width), random(height), random(1, 2));
-                    }
-                    bigC1.draw();
-                    smallC1.draw();
-                    smallC2.draw();
-                    mainChara1.disp();
-                    croc1.draw();
-                    textSize(42);
-                    fill(232, 211, 23);
-                    image(textImgs[0], 400, -90, 420, 350);
 
-                    //bullet point
-                    stroke(228, 237, 59);
-                    strokeWeight(10);
-                    var pos = bullet.draw();
 
-                    // Options
-                    textSize(30);
-                    fill(30, 189, 94);
-                    image(textImgs[1], 450-75, 380-75, 450, 450);
-                    image(textImgs[2], 450 - 75, 420 - 50, 450, 450);
 
-                    // Author
-                    textSize(20);
-                    text("UP/DOWN To navigate; Enter to select",10,690)
-                    text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all rights reserve", 550, 690);
-                    break;
-                case 1:  // instruction
-                    var f = createFont("monospace");
-                    textFont(f);
-                    background(51, 33, 51);
 
-                    textSize(42);
-                    fill(232, 211, 23);
-                    text("  _Instruction_ \n", 440, 70);
-                    textSize(25);
-                    text("Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spiders\nFight the spiders and exit the garden to win\nIn the Map: Up/Down/Left/Right to move, Shift to Accelerate\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee from battle for now\nYou have 7 potions in the bag\nLife potion can revive you but can only recover 150 HP\n", 300, 180);
-                    
-                    if (keyArray[ENTER] === 1) {
-                        //println(2);
-                        state = 0;
-                        keyArray[ENTER] = 0;
-                    }
-                    break;
-                case 2:  // start game
-                    background(0, 33, 51);
-                    pushMatrix();
-                    translate(game.xCor, game.yCor);
+            var star = function (x, y, d) {
+                noStroke();
+                fill(250, 245, 250);
+                ellipse(x, y, d, d);
+            };
 
-                    if (game.initMap === 0) { mainChara = new MainChar(350, 200, 100); game.initTilemap(); game.initMap = 1; }
-                    for (var i = 0; i < game.walls.length; i++) {
-                        game.walls[i].draw();
-                    }
-                    for (i = 0; i < game.grasses.length; i++) {
-                        game.grasses[i].draw();
-                    }
-                    for (i = 0; i < game.bricks.length; i++) {
-                        game.bricks[i].draw();
-                    }
-                    mainChara.draw();
-                    mainChara.move();
-                    var randnum  =random(300,800);
-                    if(mainChara.distMoved > randnum+700)
-                    {
-                        mainChara.distMoved = 0;
-                        game.metMonster();
+            var bigC1 = new bigCObj(-50, -50);
+            var smallC1 = new smallCObj(-150, 170);
+            var smallC2 = new smallCObj(760, 170);
+            var croc1 = new Croc(1050, 0);
+            var mainChara1 = new MainChar(250, 500, 150);
+            var bullet = new BulletObj(75, 150);
+            var battleBack = new GameBackground();
+            var draw = function () {
+                switch (state) {
+                    case 0: // main screen
+                        var f = createFont("monospace");
+                        // Title
+                        textFont(f);
+                        background(28, 31, 29);
+                        for (var i = 0; i < 500; i++) {
+                            star(random(width), random(height), random(1, 2));
+                        }
+                        bigC1.draw();
+                        smallC1.draw();
+                        smallC2.draw();
+                        mainChara1.disp();
+                        croc1.draw();
+                        textSize(42);
+                        fill(232, 211, 23);
+                        image(textImgs[0], 400, -90, 420, 350);
 
-                    }
+                        //bullet point
+                        stroke(228, 237, 59);
+                        strokeWeight(10);
+                        var pos = bullet.draw();
 
-                    if (keyArray[ENTER] === 1) {
-                        state = 0;
-                        keyArray[ENTER] = 0;
-                    }
-                    popMatrix();
-                    break;
+                        // Options
+                        textSize(30);
+                        fill(30, 189, 94);
+                        image(textImgs[1], 450-75, 380-75, 450, 450);
+                        image(textImgs[2], 450 - 75, 420 - 50, 450, 450);
 
-                case 3: // 
+                        // Author
+                        textSize(20);
+                        text("UP/DOWN To navigate; Enter to select",10,690)
+                        text(" Made By: Yi Han, Congyi Guan, Jiacong Pan, all rights reserve", 550, 690);
+                        break;
+                    case 1:  // instruction
+                        var f = createFont("monospace");
+                        textFont(f);
+                        background(51, 33, 51);
 
-                    break;
-                case 4:
-                    fill(255,255,255);
-                    rect(0, 0, 1280, 720);
-                    battleBack.draw();
-                    battleBack.move();
-                    break;
-                case 5:
-                    fill(125, 125, 0);
-                    rect(0, 0, 1280, 720);
-                    fill(0,255,255);
-                    textSize(30);
-                    text("Thanks for playing!!\nYou Won!! Full Game Experiene Cooming Soon!!\nEnter to Play Again", 200,400);
-                    if (keyArray[ENTER]) {
-                        keyArray[ENTER] = 0
-                        state = 0;
-                        mainChara = new MainChar(350, 200, 100);
-                        mainChara1 = new MainChar(250, 500, 150);
-                        mainCharBattle = new MainChar(880, 300);
-                        game = new gameObj();
-                        battleBack = new GameBackground();
-                        mainCharBattle.size = 250;
-                        enemies = [];
-                        bag = new BagObj();
-                    }
-                default:
-                    break;
-            }
-        };
+                        textSize(42);
+                        fill(232, 211, 23);
+                        text("  _Instruction_ \n", 440, 70);
+                        textSize(25);
+                        text("Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spiders\nFight the spiders and exit the garden to win\nIn the Map: Up/Down/Left/Right to move, Shift to Accelerate\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee from battle for now\nYou have 7 potions in the bag\nLife potion can revive you but can only recover 150 HP\n", 300, 180);
+                        
+                        if (keyArray[ENTER] === 1) {
+                            //println(2);
+                            state = 0;
+                            keyArray[ENTER] = 0;
+                        }
+                        break;
+                    case 2:  // start game
+                        background(0, 33, 51);
+                        pushMatrix();
+                        translate(game.xCor, game.yCor);
+
+                        if (game.initMap === 0) { mainChara = new MainChar(350, 200, 100); game.initTilemap(); game.initMap = 1; }
+                        for (var i = 0; i < game.walls.length; i++) {
+                            game.walls[i].draw();
+                        }
+                        for (i = 0; i < game.grasses.length; i++) {
+                            game.grasses[i].draw();
+                        }
+                        for (i = 0; i < game.bricks.length; i++) {
+                            game.bricks[i].draw();
+                        }
+                        mainChara.draw();
+                        mainChara.move();
+                        var randnum  =random(300,800);
+                        if(mainChara.distMoved > randnum+700)
+                        {
+                            mainChara.distMoved = 0;
+                            game.metMonster();
+
+                        }
+
+                        if (keyArray[ENTER] === 1) {
+                            state = 0;
+                            keyArray[ENTER] = 0;
+                        }
+                        popMatrix();
+                        break;
+
+                    case 3: // 
+
+                        break;
+                    case 4:
+                        fill(255,255,255);
+                        rect(0, 0, 1280, 720);
+                        battleBack.draw();
+                        battleBack.move();
+                        break;
+                    case 5:
+                        fill(125, 125, 0);
+                        rect(0, 0, 1280, 720);
+                        fill(0,255,255);
+                        textSize(30);
+                        text("Thanks for playing!!\nYou Won!! Full Game Experiene Cooming Soon!!\nEnter to Play Again", 200,400);
+                        if (keyArray[ENTER]) {
+                            keyArray[ENTER] = 0
+                            state = 0;
+                            mainChara = new MainChar(350, 200, 100);
+                            mainChara1 = new MainChar(250, 500, 150);
+                            mainCharBattle = new MainChar(880, 300);
+                            game = new gameObj();
+                            battleBack = new GameBackground();
+                            mainCharBattle.size = 250;
+                            enemies = [];
+                            bag = new BagObj();
+                        }
+                    default:
+                        break;
+                }
+            };
     }
     
 };
