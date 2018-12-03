@@ -636,6 +636,7 @@ var sketchProc = function (processingInstance) {
         
 
         //left/right selection
+        var pb = 1;
         GameBackground.prototype.move = function () {
             switch (this.state) {
                 case BattleMenuStates.IDLE:
@@ -959,17 +960,20 @@ var sketchProc = function (processingInstance) {
                     break;
                 case BattleMenuStates.FLEE:
                     var rand = random(1,10);
-                    prob =  Math.floor(rand) % 5;
-                    print(prob);
-                    if(prob == 0){
-                        for (var i = enemies.length - 1; i >= 0; i--) {
-                            enemies.splice(i, 1);
-                        }
+                    prob =  Math.floor(rand);
+                    println(pb);
+                    if(prob <= pb){
+                        enemies=[];
+                        this.state = BattleMenuStates.IDLE;
                         state = 2;
                     }
                     else{
+                        pb++;
                         this.state = BattleMenuStates.ENEATKING;
+                        
                     }
+
+
                     break;
                 default:
                     break;
@@ -1011,6 +1015,7 @@ var sketchProc = function (processingInstance) {
                 enemies.push(new SpiderObj(200, 350));
                 enemies.push(new SpiderObj(450, 200));
             }
+            pb = 2;
             state = 4;
 
         };
@@ -1287,6 +1292,7 @@ var sketchProc = function (processingInstance) {
 
                         break;
                     case 4:
+                        
                         fill(255,255,255);
                         rect(0, 0, 1280, 720);
                         battleBack.draw();
