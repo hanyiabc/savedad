@@ -920,7 +920,9 @@ var sketchProc = function (processingInstance) {
                             if (enemies[i].pixMoved >= 32) {
                                 mainCharBattle.position.x -= 16;
                                 this.state = BattleMenuStates.ENEATKED;
-                                enemies[i].pixMoved = 0;
+                                for (var j = 0; j < enemies.length; j++) {
+                                    enemies[j].pixMoved = 0;                                
+                                }
                             }
                         }
                         else if (enemies[i].pixMoved < 16) {
@@ -1034,7 +1036,7 @@ var sketchProc = function (processingInstance) {
 
         gameObj.prototype.metMonster = function () {
             
-            var rand = random(1, 2);
+            var rand = random(1, 3);
             if (Math.floor(rand) == 1) {
                 enemies.push(new SpiderObj(200, 350));
             }
