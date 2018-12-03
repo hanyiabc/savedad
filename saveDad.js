@@ -48,6 +48,7 @@ var sketchProc = function (processingInstance) {
                 backgroundImgs.push(loadImage("assets/attack_menu.png"));
                 backgroundImgs.push(loadImage("assets/attack_menu.png"));
                 backgroundImgs.push(loadImage("assets/battle_backv2.png"));
+                backgroundImgs.push(loadImage("assets/attack_menu_nf.png"));
 
                 mainChar.push(loadImage("assets/main_back.png"));
                 mainChar.push(loadImage("assets/main_back_f1.png"));
@@ -280,7 +281,7 @@ var sketchProc = function (processingInstance) {
             this.spider.push(loadImage("assets/spider2.png"));
             this.HP = 300;
             this.currHP = this.HP;
-            this.ATK = 80;
+            this.ATK = 60;
             this.pixMoved = 0;
         };
 
@@ -315,7 +316,7 @@ var sketchProc = function (processingInstance) {
             this.size = 200;
             this.sizeX = 886 / 4;
             this.sizeY = 625 / 4;
-            this.HP = 2000;
+            this.HP = 1700;
             this.ATK = 45;
             this.currHP = this.HP;
             this.pixMoved = 0;
@@ -599,7 +600,15 @@ var sketchProc = function (processingInstance) {
             pushMatrix();
             translate(1015, 163);
             rotate(this.menuRotate);
-            image(backgroundImgs[3], -125, -125, 250, 250);
+            if (enemies.length == 1 && enemies[0] instanceof Croc)
+            {
+                image(backgroundImgs[5], -125, -125, 250, 250);                    
+            }
+            else
+            {
+                image(backgroundImgs[3], -125, -125, 250, 250);
+                
+            }
             popMatrix();
 
 
@@ -656,7 +665,12 @@ var sketchProc = function (processingInstance) {
                         text("Use Item: using an item will finish your round", textposX, textposY);
                         break;
                     case BattleMenuSelection.FLEE:
-                        text("You have 30% chances to flee successfully.", textposX, textposY);
+                        if (enemies[0] instanceof Croc) {
+                            text("You can't flee while fighting the boss.", textposX, textposY);
+                        }
+                        else {
+                            text("You have 30% chances to flee successfully.", textposX, textposY);                            
+                        }
                         break;
                     case BattleMenuSelection.ULR:
                         text("Ultimate Skill: Deals 300 Damage, recharge every 3 rounds", textposX, textposY);
@@ -707,7 +721,13 @@ var sketchProc = function (processingInstance) {
                                 this.state = BattleMenuStates.INBAG
                                 break;
                             case BattleMenuSelection.FLEE:
-                                this.state = BattleMenuStates.FLEE;
+                                if (enemies.length == 1 && enemies[0] instanceof Croc) {
+  
+                                }
+                                else
+                                {
+                                    this.state = BattleMenuStates.FLEE;                                    
+                                }
                                 break;
                             case BattleMenuSelection.ULR:
                                 if (ulrCharge >= 3)
@@ -868,10 +888,10 @@ var sketchProc = function (processingInstance) {
                     {
                         fill(0, 255, 0);
                         stroke(0, 0, 0);
-                        rect(300, 300, 600, 250);
+                        rect(300, 300, 700, 250);
                         fill(0, 0, 0);
                         textSize(50);
-                        text("You Lose!\nPress Enter to try again", 350, 600);
+                        text("You Lose!\nPress Enter to try again", 350, 350);
                         if (keyArray[ENTER]) {
                             keyArray[ENTER] = 0
                             state = 0;
@@ -913,7 +933,7 @@ var sketchProc = function (processingInstance) {
                     break;
                 case BattleMenuStates.ATKED:
                     enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
-                    var isCorc;
+                    var isCorc = 0;
                     for (var i = enemies.length - 1; i >= 0; i--) {
                         if (enemies[i].currHP <= 0) {
                             isCorc = enemies[i] instanceof Croc;
