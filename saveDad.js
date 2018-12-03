@@ -27,7 +27,7 @@ var sketchProc = function (processingInstance) {
 
         var initialized=0;
         var wall; var grass; var brick;
-
+        var ulrCharge = 0;
         var keyPressed = function () { keyArray[keyCode] = 1;};
         
         var keyReleased = function () { keyArray[keyCode] = 0;};
@@ -311,11 +311,14 @@ var sketchProc = function (processingInstance) {
             this.position = new PVector(x, y);
             this.currFrame = frameCount;
             this.step = 0;
+            this.state = 0;
+            this.size = 200;
             this.sizeX = 886 / 4;
             this.sizeY = 625 / 4;
-            this.HP = 600;
-            this.ATK = 40;
+            this.HP = 2000;
+            this.ATK = 45;
             this.currHP = this.HP;
+            this.pixMoved = 0;
         };
         Croc.prototype.draw = function () {
             if (frameCount - this.currFrame > 5) {
@@ -553,8 +556,9 @@ var sketchProc = function (processingInstance) {
             ENEATKING: 11,
             ENEATKED: 12,
             ULRING: 13,
-            ULRING: 14,
-            FLEE: 15
+            FLEE: 14,
+            ULRNC: 15, 
+            FLEEF: 16, 
         };
 
         var BattleMenuSelection = {
@@ -652,10 +656,10 @@ var sketchProc = function (processingInstance) {
                         text("Use Item: using an item will finish your round", textposX, textposY);
                         break;
                     case BattleMenuSelection.FLEE:
-                        text("You have 20% chances to flee successfully", textposX, textposY);
+                        text("You have 30% chances to flee successfully.", textposX, textposY);
                         break;
                     case BattleMenuSelection.ULR:
-                        text("Ultimate Skill: you have not unlocked your ultimate yet", textposX, textposY);
+                        text("Ultimate Skill: Deals 300 Damage, recharge every 3 rounds", textposX, textposY);
                         break;
                 }
             }
@@ -697,6 +701,7 @@ var sketchProc = function (processingInstance) {
                         switch (this.selection) {
                             case BattleMenuSelection.ATK:
                                 this.state = BattleMenuStates.ATKING;
+                                ulrCharge++;
                                 break;
                             case BattleMenuSelection.ITEM:
                                 this.state = BattleMenuStates.INBAG
@@ -705,8 +710,15 @@ var sketchProc = function (processingInstance) {
                                 this.state = BattleMenuStates.FLEE;
                                 break;
                             case BattleMenuSelection.ULR:
-                                this.state = BattleMenuStates.ULRING;
-                                //this.state = BattleMenuStates.ENEMYATK;
+                                if (ulrCharge >= 3)
+                                {
+                                    ulrCharge = 0;
+                                    this.state = BattleMenuStates.ULRING;
+                                }
+                                else
+                                {
+                                    this.state = BattleMenuStates.ULRNC;
+                                }
                                 break;
                         }
 
@@ -780,6 +792,7 @@ var sketchProc = function (processingInstance) {
 
                     if (keyArray[ENTER]) {
                         keyArray[ENTER] = 0;
+                        ulrCharge++;
                         switch (this.bagSelection) {
                             case 0:
                                 if (bag.numofPotion > 0) {
@@ -900,14 +913,21 @@ var sketchProc = function (processingInstance) {
                     break;
                 case BattleMenuStates.ATKED:
                     enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
+                    var isCorc;
                     for (var i = enemies.length - 1; i >= 0; i--) {
                         if (enemies[i].currHP <= 0) {
+                            isCorc = enemies[i] instanceof Croc;
                             enemies.splice(i, 1);
                         }
                     }
                     this.state = BattleMenuStates.ENEATKING;
                     if (enemies.length == 0) {
                         this.state = BattleMenuStates.WON;
+                    }
+                    if (isCorc)
+                    {
+                        this.state = BattleMenuStates.IDLE;
+                        state = 5;
                     }
                     break;
                 case BattleMenuStates.ENEATKING:
@@ -976,7 +996,7 @@ var sketchProc = function (processingInstance) {
                     }
                     break;
                 case BattleMenuStates.ULRED:
-                    enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
+                    enemies[this.enemyIdx].currHP -= 300;
                     for (var i = enemies.length - 1; i >= 0; i--) {
                         if (enemies[i].currHP <= 0) {
                             enemies.splice(i, 1);
@@ -988,23 +1008,46 @@ var sketchProc = function (processingInstance) {
                     }
                     break;
                 case BattleMenuStates.FLEE:
-                    var rand = random(1,10);
-                    prob =  Math.floor(rand);
-                    println(pb);
-                    if(prob <= pb){
-                        enemies=[];
+                    var rand = random(1, 10);
+                    prob = Math.floor(rand);
+                    println(prob);
+                    if (prob <= pb) {
+                        enemies = [];
                         this.state = BattleMenuStates.IDLE;
                         state = 2;
+                        pb = 3;
                     }
-                    else{
+                    else {
                         pb++;
-                        this.state = BattleMenuStates.ENEATKING;
+                        this.state = BattleMenuStates.FLEEF;
                         
                     }
-
-
                     break;
-                default:
+                case BattleMenuStates.ULRNC:
+                    fill(0, 255, 0);
+                    stroke(0, 0, 0);
+                    rect(180, 300, 1000, 250);
+                    fill(0, 0, 0);
+                    textSize(50);
+                    text("Ultimate Skill Not Charged. \nPress Enter", 200, 400)
+                    if (keyArray[ENTER]) {
+                        keyArray[ENTER] = 0
+                        this.state = BattleMenuStates.IDLE;
+                    }
+                    break;
+                case BattleMenuStates.FLEEF:
+                    fill(0, 255, 0);
+                    stroke(0, 0, 0);
+                    rect(180, 300, 1000, 250);
+                    fill(0, 0, 0);
+                    textSize(50);
+                    text("Failed to flee. \nPress Enter", 200, 400)
+                    if (keyArray[ENTER]) {
+                        keyArray[ENTER] = 0
+                        this.state = BattleMenuStates.ENEATKING;
+                    }
+                    break;
+                    default:
                     break;
             }
         };
@@ -1162,7 +1205,8 @@ var sketchProc = function (processingInstance) {
             }
             if(this.position.y > 1120 && this.position.x > 2300)
             {  
-                state = 5;
+                enemies.push(new Croc(200, 350));                
+                state = 4;
             }
         };
 
@@ -1270,7 +1314,8 @@ var sketchProc = function (processingInstance) {
                         fill(232, 211, 23);
                         text("  _Instruction_ \n", 440, 70);
                         textSize(25);
-                        text("Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spiders\nFight the spiders and exit the garden to win\nIn the Map: Up/Down/Left/Right to move, Shift to Accelerate\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee from battle for now\nYou have 7 potions in the bag\nLife potion can revive you but can only recover 150 HP\n", 300, 180);
+                        //Instruction: You are looking for your dady, \nbut you have to go through a garden filled with spiders\n
+                        text("Dad has been caught by a Crocodile. \nFight the spiders in the garden \nand beat the crocdile to win\nIn the Map: Up/Down/Left/Right to move, Shift to Accelerate\nDuring battle: Left and Right to choose an option, enter to confirm.\n\n\nYou are unable to flee from battle for now\nYou have 7 potions in the bag\nLife potion can revive you but can only recover 150 HP\n", 300, 180);
                         
                         if (keyArray[ENTER] === 1) {
                             //println(2);
@@ -1282,8 +1327,9 @@ var sketchProc = function (processingInstance) {
                         background(0, 33, 51);
                         pushMatrix();
                         translate(game.xCor, game.yCor);
-
                         if (game.initMap === 0) { mainChara = new MainChar(350, 200, 100); game.initTilemap(); game.initMap = 1; }
+
+                        //if (game.initMap === 0) { mainChara = new MainChar(2100,1000 , 100); game.initTilemap(); game.initMap = 1; }
                         for (var i = 0; i < game.walls.length; i++) {
                             game.walls[i].draw();
                         }
@@ -1338,10 +1384,7 @@ var sketchProc = function (processingInstance) {
                         mainChara2.drawEnd();
                         mainChara2.draw();
                         Dad.draw();
-                        //rect(0, 0, 1280, 720);
-                        //fill(0,255,255);
                         textSize(30);
-                        //text("Thanks for playing!!\nYou Won!! Full Game Experiene Cooming Soon!!\nEnter to Play Again", 200,400);
                         if (keyArray[ENTER]) {
                             keyArray[ENTER] = 0
                             state = 0;
