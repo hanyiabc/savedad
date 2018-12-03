@@ -42,7 +42,7 @@ var sketchProc = function (processingInstance) {
                 backgroundImgs.push(loadImage("assets/battle_background.png"));
                 backgroundImgs.push(loadImage("assets/status.png"));
                 backgroundImgs.push(loadImage("assets/attack_menu.png"));
-                backgroundImgs.push(loadImage("assets/attack_menu_nf.png"));
+                backgroundImgs.push(loadImage("assets/attack_menu.png"));
                 backgroundImgs.push(loadImage("assets/battle_backv2.png"));
 
                 mainChar.push(loadImage("assets/main_back.png"));
@@ -86,6 +86,7 @@ var sketchProc = function (processingInstance) {
                 brick = loadImage("assets/wall_castle.png");
         };
         initialize();
+
         
         var particleObj = function (x, y) {
             this.position = new PVector(x, y);
@@ -523,7 +524,10 @@ var sketchProc = function (processingInstance) {
             ATKING: 9,
             ATKED: 10,
             ENEATKING: 11,
-            ENEATKED: 12
+            ENEATKED: 12,
+            ULRING: 13,
+            ULRING: 14,
+            FLEE: 15
         };
 
         var BattleMenuSelection = {
@@ -621,16 +625,13 @@ var sketchProc = function (processingInstance) {
                         text("Use Item: using an item will finish your round", textposX, textposY);
                         break;
                     case BattleMenuSelection.FLEE:
-                        text("You are not allowed to flee in this stage of the game", textposX, textposY);
+                        text("You have 20% chances to flee successfully", textposX, textposY);
                         break;
                     case BattleMenuSelection.ULR:
                         text("Ultimate Skill: you have not unlocked your ultimate yet", textposX, textposY);
                         break;
                 }
             }
-
-
-
         };
         
 
@@ -673,8 +674,10 @@ var sketchProc = function (processingInstance) {
                                 this.state = BattleMenuStates.INBAG
                                 break;
                             case BattleMenuSelection.FLEE:
+                                this.state = BattleMenuStates.FLEE;
                                 break;
                             case BattleMenuSelection.ULR:
+                                this.state = BattleMenuStates.ULRING;
                                 //this.state = BattleMenuStates.ENEMYATK;
                                 break;
                         }
@@ -917,6 +920,57 @@ var sketchProc = function (processingInstance) {
                         this.state = BattleMenuStates.LOST;
                     }
                     break;
+                case BattleMenuStates.ULRING:
+                    if (this.pixMoved >= 32) {
+                        if (particles.length == 0) {
+                            enemies[this.enemyIdx].position.x += 16;
+                            this.state = BattleMenuStates.ULRED;
+                            this.pixMoved = 0;
+                        }
+                    }
+                    else if (this.pixMoved >= 16) {
+                        mainCharBattle.position.x += 2;
+                        this.pixMoved += 2;
+                        enemies[this.enemyIdx].position.x -= 2;
+
+                    }
+                    else if (this.pixMoved < 16) {
+                        mainCharBattle.position.x -= 2;
+                        this.pixMoved += 2;
+                    }
+                    if (this.pixMoved == 16) {
+                        for (var i = 0; i < 800; i++) {
+                            var rand = random(-100,100);
+                            particles.push(new particleObj(enemies[this.enemyIdx].position.x + enemies[this.enemyIdx].size / 2+rand , enemies[this.enemyIdx].position.y + enemies[this.enemyIdx].size / 2+rand));
+                        }
+                    }
+                    break;
+                case BattleMenuStates.ULRED:
+                    enemies[this.enemyIdx].currHP -= mainCharBattle.ATK + Math.floor((Math.random() * mainCharBattle.ATK) + 1);
+                    for (var i = enemies.length - 1; i >= 0; i--) {
+                        if (enemies[i].currHP <= 0) {
+                            enemies.splice(i, 1);
+                        }
+                    }
+                    this.state = BattleMenuStates.ENEATKING;
+                    if (enemies.length == 0) {
+                        this.state = BattleMenuStates.WON;
+                    }
+                    break;
+                case BattleMenuStates.FLEE:
+                    var rand = random(1,10);
+                    prob =  Math.floor(rand) % 5;
+                    print(prob);
+                    if(prob == 0){
+                        for (var i = enemies.length - 1; i >= 0; i--) {
+                            enemies.splice(i, 1);
+                        }
+                        state = 2;
+                    }
+                    else{
+                        this.state = BattleMenuStates.ENEATKING;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -960,6 +1014,10 @@ var sketchProc = function (processingInstance) {
             state = 4;
 
         };
+        MainChar.prototype.anime = function(){
+            
+        }
+
         MainChar.prototype.move = function () {
             // Change map threshhold here
             var mapxMin = 100;
@@ -1121,10 +1179,6 @@ var sketchProc = function (processingInstance) {
         };
 
 
-
-
-
-
             var star = function (x, y, d) {
                 noStroke();
                 fill(250, 245, 250);
@@ -1136,9 +1190,12 @@ var sketchProc = function (processingInstance) {
             var smallC2 = new smallCObj(760, 170);
             var croc1 = new Croc(1050, 0);
             var mainChara1 = new MainChar(250, 500, 150);
+            var mainChara2 = new MainChar(250, 500, 150);
             var bullet = new BulletObj(75, 150);
             var battleBack = new GameBackground();
+
             var draw = function () {
+ 
                 switch (state) {
                     case 0: // main screen
                         var f = createFont("monospace");
@@ -1219,7 +1276,11 @@ var sketchProc = function (processingInstance) {
                             state = 0;
                             keyArray[ENTER] = 0;
                         }
+                        if(keyArray[65] === 1){
+                            state = 5;
+                        }
                         popMatrix();
+
                         break;
 
                     case 3: // 
@@ -1232,11 +1293,21 @@ var sketchProc = function (processingInstance) {
                         battleBack.move();
                         break;
                     case 5:
-                        fill(125, 125, 0);
-                        rect(0, 0, 1280, 720);
-                        fill(0,255,255);
+                        background(29, 40, 115);
+                        fill(255, 242, 0);
+                        for (var i = 0; i < 500; i++) {
+                            star(random(width), random(height), random(1, 2));
+                        }
+                        fill(255, 255, 175);
+                        ellipse(120, 105, 100, 100);
+                        bigC1.draw();
+                        smallC1.draw();
+                        smallC2.draw();
+                        
+                        //rect(0, 0, 1280, 720);
+                        //fill(0,255,255);
                         textSize(30);
-                        text("Thanks for playing!!\nYou Won!! Full Game Experiene Cooming Soon!!\nEnter to Play Again", 200,400);
+                        //text("Thanks for playing!!\nYou Won!! Full Game Experiene Cooming Soon!!\nEnter to Play Again", 200,400);
                         if (keyArray[ENTER]) {
                             keyArray[ENTER] = 0
                             state = 0;
