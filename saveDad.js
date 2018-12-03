@@ -17,10 +17,14 @@ var sketchProc = function (processingInstance) {
         var particles = [];
         var pandas = [];
         var mainChar = [];
+        var mainCharDad;
         var crocImgs = [];
         var textImgs = [];
         var bigCastle = [];
         var smallCastle = [];
+        var love;
+        var dad;
+
         var initialized=0;
         var wall; var grass; var brick;
 
@@ -84,6 +88,8 @@ var sketchProc = function (processingInstance) {
                 wall= loadImage("assets/block_brown_main.png");
                 grass = loadImage("assets/grassblock1.png");
                 brick = loadImage("assets/wall_castle.png");
+                love = loadImage("assets/love.png");
+                dad = loadImage("assets/dad.png");
         };
         initialize();
 
@@ -350,6 +356,16 @@ var sketchProc = function (processingInstance) {
             this.distMoved = 0;
         };
 
+        var MainCharDad = function (x, y, size) {
+            this.position = new PVector(x, y);
+            this.size = size;
+        };
+        var Dad = new MainCharDad(600,300,200);
+        MainCharDad.prototype.draw = function(){
+            image(dad, this.position.x,this.position.y,  this.size,  this.size);
+        };
+
+        
         //functions for checking wall
         var checkWallUp = function () {
             for (var i = 0; i < game.walls.length; i++) {
@@ -436,6 +452,17 @@ var sketchProc = function (processingInstance) {
                 }
 
             }
+        };
+
+        MainChar.prototype.drawEnd = function(){
+            this.MainStates = MainStates.RIGHT;
+            this.position.x++;
+            Dad.position = new PVector(1280-this.position.x, this.position.y-100);
+            if (this.position.x >= 600){
+                this.position.x = 600
+                image(love, this.position.x+30, this.position.y-50, this.size, this.size); 
+            }
+
         };
 
         MainChar.prototype.drawBattle = function () {
@@ -1019,9 +1046,6 @@ var sketchProc = function (processingInstance) {
             state = 4;
 
         };
-        MainChar.prototype.anime = function(){
-            
-        }
 
         MainChar.prototype.move = function () {
             // Change map threshhold here
@@ -1195,7 +1219,7 @@ var sketchProc = function (processingInstance) {
             var smallC2 = new smallCObj(760, 170);
             var croc1 = new Croc(1050, 0);
             var mainChara1 = new MainChar(250, 500, 150);
-            var mainChara2 = new MainChar(250, 500, 150);
+            var mainChara2 = new MainChar(250, 600, 150);
             var bullet = new BulletObj(75, 150);
             var battleBack = new GameBackground();
 
@@ -1309,7 +1333,9 @@ var sketchProc = function (processingInstance) {
                         bigC1.draw();
                         smallC1.draw();
                         smallC2.draw();
-                        
+                        mainChara2.drawEnd();
+                        mainChara2.draw();
+                        Dad.draw();
                         //rect(0, 0, 1280, 720);
                         //fill(0,255,255);
                         textSize(30);
